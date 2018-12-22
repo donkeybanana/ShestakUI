@@ -220,41 +220,36 @@ local function Shared(self, unit)
 
 		-- Combat icon
 		if C.unitframe.icons_combat == true then
-			self.Combat = self.Health:CreateTexture(nil, "OVERLAY")
-			self.Combat:SetSize(18, 18)
-			self.Combat:SetPoint("TOPRIGHT", 4, 8)
+			self.CombatIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+			self.CombatIndicator:SetSize(18, 18)
+			self.CombatIndicator:SetPoint("TOPRIGHT", 4, 8)
 		end
 
 		-- Resting icon
 		if C.unitframe.icons_resting == true and T.level ~= MAX_PLAYER_LEVEL then
-			self.Resting = self.Power:CreateTexture(nil, "OVERLAY")
-			self.Resting:SetSize(18, 18)
-			self.Resting:SetPoint("BOTTOMLEFT", -8, -8)
+			self.RestingIndicator = self.Power:CreateTexture(nil, "OVERLAY")
+			self.RestingIndicator:SetSize(18, 18)
+			self.RestingIndicator:SetPoint("BOTTOMLEFT", -8, -8)
 		end
 
-		-- Leader/Assistant/ML icons
+		-- Leader/Assistant icons
 		if C.raidframe.icons_leader == true then
 			-- Leader icon
-			self.Leader = self.Health:CreateTexture(nil, "OVERLAY")
-			self.Leader:SetSize(14, 14)
-			self.Leader:SetPoint("TOPLEFT", -3, 9)
+			self.LeaderIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+			self.LeaderIndicator:SetSize(14, 14)
+			self.LeaderIndicator:SetPoint("TOPLEFT", -3, 9)
 
 			-- Assistant icon
-			self.Assistant = self.Health:CreateTexture(nil, "OVERLAY")
-			self.Assistant:SetSize(12, 12)
-			self.Assistant:SetPoint("TOPLEFT", -3, 8)
-
-			-- Master looter icon
-			self.MasterLooter = self.Health:CreateTexture(nil, "OVERLAY")
-			self.MasterLooter:SetSize(12, 12)
-			self.MasterLooter:SetPoint("TOPRIGHT", 3, 8)
+			self.AssistantIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+			self.AssistantIndicator:SetSize(12, 12)
+			self.AssistantIndicator:SetPoint("TOPLEFT", -3, 8)
 		end
 
 		-- LFD role icons
 		if C.raidframe.icons_role == true then
-			self.LFDRole = self.Health:CreateTexture(nil, "OVERLAY")
-			self.LFDRole:SetSize(12, 12)
-			self.LFDRole:SetPoint("TOPLEFT", 10, 8)
+			self.GroupRoleIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+			self.GroupRoleIndicator:SetSize(12, 12)
+			self.GroupRoleIndicator:SetPoint("TOPLEFT", 10, 8)
 		end
 
 		-- Rune bar
@@ -263,6 +258,7 @@ local function Shared(self, unit)
 			self.Runes:CreateBackdrop("Default")
 			self.Runes:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 			self.Runes:SetSize(217, 7)
+			self.Runes.colorSpec = true
 
 			for i = 1, 6 do
 				self.Runes[i] = CreateFrame("StatusBar", self:GetName().."_RuneBar", self.Runes)
@@ -273,26 +269,25 @@ local function Shared(self, unit)
 					self.Runes[i]:SetPoint("TOPLEFT", self.Runes[i-1], "TOPRIGHT", 1, 0)
 				end
 				self.Runes[i]:SetStatusBarTexture(C.media.texture)
-				self.Runes[i]:SetStatusBarColor(0.69, 0.31, 0.31)
 
 				self.Runes[i].bg = self.Runes[i]:CreateTexture(nil, "BORDER")
 				self.Runes[i].bg:SetAllPoints()
 				self.Runes[i].bg:SetTexture(C.media.texture)
-				self.Runes[i].bg:SetVertexColor(0.69, 0.31, 0.31, 0.2)
+				self.Runes[i].bg.multiplier = 0.2
 			end
 		end
 
 		if T.class == "MAGE" then
 			-- Arcane Charge bar
 			if C.unitframe_class_bar.arcane == true then
-				self.ArcaneCharge = CreateFrame("Frame", self:GetName().."ArcaneCharge", self)
+				self.ArcaneCharge = CreateFrame("Frame", self:GetName().."_ArcaneCharge", self)
 				self.ArcaneCharge:CreateBackdrop("Default")
 				self.ArcaneCharge:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 				self.ArcaneCharge:SetSize(217, 7)
 
 				for i = 1, 4 do
-					self.ArcaneCharge[i] = CreateFrame("StatusBar", self:GetName().."ArcaneCharge"..i, self.ArcaneCharge)
-					self.ArcaneCharge[i]:SetSize(213 / 4, 7)
+					self.ArcaneCharge[i] = CreateFrame("StatusBar", self:GetName().."_ArcaneCharge"..i, self.ArcaneCharge)
+					self.ArcaneCharge[i]:SetSize(214 / 4, 7)
 					if i == 1 then
 						self.ArcaneCharge[i]:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 					else
@@ -411,7 +406,7 @@ local function Shared(self, unit)
 			self.HolyPower:SetSize(217, 7)
 
 			for i = 1, 5 do
-				self.HolyPower[i] = CreateFrame("StatusBar", self:GetName().."_HolyPowerBar", self.HolyPower)
+				self.HolyPower[i] = CreateFrame("StatusBar", self:GetName().."_HolyPower"..i, self.HolyPower)
 				self.HolyPower[i]:SetSize(213 / 5, 7)
 				if i == 1 then
 					self.HolyPower[i]:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
@@ -425,11 +420,7 @@ local function Shared(self, unit)
 				self.HolyPower[i].bg:SetAllPoints()
 				self.HolyPower[i].bg:SetTexture(C.media.texture)
 				self.HolyPower[i].bg:SetVertexColor(0.89, 0.88, 0.1, 0.2)
-
-				self.HolyPower[i].width = self.HolyPower[i]:GetWidth()
 			end
-
-			self.HolyPower.Override = T.UpdateHoly
 		end
 
 		-- Soul Shards bar
@@ -464,9 +455,9 @@ local function Shared(self, unit)
 			self.CPoints:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 			self.CPoints:SetSize(217, 7)
 
-			for i = 1, 8 do
+			for i = 1, 6 do
 				self.CPoints[i] = CreateFrame("StatusBar", self:GetName().."_ComboBar", self.CPoints)
-				self.CPoints[i]:SetSize(213 / 8, 7)
+				self.CPoints[i]:SetSize(213 / 10, 7)
 				if i == 1 then
 					self.CPoints[i]:SetPoint("LEFT", self.CPoints)
 				else
@@ -481,8 +472,6 @@ local function Shared(self, unit)
 			self.CPoints[4]:SetStatusBarColor(0.9, 0.9, 0.1)
 			self.CPoints[5]:SetStatusBarColor(0.1, 0.9, 0.1)
 			self.CPoints[6]:SetStatusBarColor(0.1, 0.9, 0.1)
-			self.CPoints[7]:SetStatusBarColor(0.1, 0.9, 0.1)
-			self.CPoints[8]:SetStatusBarColor(0.1, 0.9, 0.1)
 
 			if T.class == "DRUID" and C.unitframe_class_bar.combo_always ~= true then
 				self:RegisterEvent("UPDATE_SHAPESHIFT_FORM", T.UpdateComboPoint)
@@ -585,9 +574,10 @@ local function Shared(self, unit)
 		end
 
 		-- Experience bar
-		if T.level ~= MAX_PLAYER_LEVEL and C.unitframe.plugins_experience_bar == true then
+		if C.unitframe.plugins_experience_bar == true then
 			self.Experience = CreateFrame("StatusBar", self:GetName().."_Experience", self)
 			self.Experience:CreateBackdrop("Default")
+			self.Experience:EnableMouse(true)
 			if C.unitframe.portrait_enable == true then
 				self.Experience:SetPoint("TOPLEFT", self, "TOPLEFT", -25 - C.unitframe.portrait_width, 28)
 			else
@@ -596,56 +586,96 @@ local function Shared(self, unit)
 			self.Experience:SetSize(7, 94)
 			self.Experience:SetOrientation("Vertical")
 			self.Experience:SetStatusBarTexture(C.media.texture)
-			self.Experience:SetStatusBarColor(T.color.r, T.color.g, T.color.b)
-			self.Experience:SetAlpha(0)
 
 			self.Experience.bg = self.Experience:CreateTexture(nil, "BORDER")
 			self.Experience.bg:SetAllPoints()
 			self.Experience.bg:SetTexture(C.media.texture)
-			self.Experience.bg:SetVertexColor(T.color.r, T.color.g, T.color.b, 0.2)
 
 			self.Experience.Rested = CreateFrame("StatusBar", nil, self.Experience)
-			self.Experience.Rested:SetParent(self.Experience)
 			self.Experience.Rested:SetOrientation("Vertical")
 			self.Experience.Rested:SetAllPoints()
 			self.Experience.Rested:SetStatusBarTexture(C.media.texture)
-			self.Experience.Rested:SetStatusBarColor(0, 0.5, 1, 0.5)
 
-			self.Experience:HookScript("OnEnter", function(self) self:SetAlpha(1) end)
-			self.Experience:HookScript("OnLeave", function(self) self:SetAlpha(0) end)
-			self.Experience.Tooltip = true
+			self.Experience.inAlpha = 1
+			self.Experience.outAlpha = 0
 		end
 
 		-- Reputation bar
 		if C.unitframe.plugins_reputation_bar == true then
 			self.Reputation = CreateFrame("StatusBar", self:GetName().."_Reputation", self)
 			self.Reputation:CreateBackdrop("Default")
+			self.Reputation:EnableMouse(true)
 			if C.unitframe.portrait_enable == true then
-				if T.level == MAX_PLAYER_LEVEL then
-					self.Reputation:SetPoint("TOPLEFT", self, "TOPLEFT", -25 - C.unitframe.portrait_width, 28)
-				else
+				if self.Experience and self.Experience:IsShown() then
 					self.Reputation:SetPoint("TOPLEFT", self, "TOPLEFT", -39 - C.unitframe.portrait_width, 28)
+				else
+					self.Reputation:SetPoint("TOPLEFT", self, "TOPLEFT", -25 - C.unitframe.portrait_width, 28)
 				end
 			else
-				if T.level == MAX_PLAYER_LEVEL then
-					self.Reputation:SetPoint("TOPLEFT", self, "TOPLEFT", -18, 28)
-				else
+				if self.Experience and self.Experience:IsShown() then
 					self.Reputation:SetPoint("TOPLEFT", self, "TOPLEFT", -32, 28)
+				else
+					self.Reputation:SetPoint("TOPLEFT", self, "TOPLEFT", -18, 28)
 				end
 			end
 			self.Reputation:SetSize(7, 94)
 			self.Reputation:SetOrientation("Vertical")
 			self.Reputation:SetStatusBarTexture(C.media.texture)
-			self.Reputation:SetAlpha(0)
 
 			self.Reputation.bg = self.Reputation:CreateTexture(nil, "BORDER")
 			self.Reputation.bg:SetAllPoints()
 			self.Reputation.bg:SetTexture(C.media.texture)
 
-			self.Reputation:HookScript("OnEnter", function(self) self:SetAlpha(1) end)
-			self.Reputation:HookScript("OnLeave", function(self) self:SetAlpha(0) end)
-			self.Reputation.PostUpdate = T.UpdateReputationColor
-			self.Reputation.Tooltip = true
+			self.Reputation.inAlpha = 1
+			self.Reputation.outAlpha = 0
+			self.Reputation.colorStanding = true
+		end
+
+		-- Artifact Power bar
+		if C.unitframe.plugins_artifact_bar == true then
+			self.ArtifactPower = CreateFrame("StatusBar", self:GetName().."_ArtifactPower", self)
+			self.ArtifactPower:CreateBackdrop("Default")
+			self.ArtifactPower:EnableMouse(true)
+			if C.unitframe.portrait_enable == true then
+				if T.level == MAX_PLAYER_LEVEL then
+					if C.unitframe.plugins_reputation_bar == true then
+						self.ArtifactPower:SetPoint("TOPLEFT", self, "TOPLEFT", -38 - C.unitframe.portrait_width, 28)
+					else
+						self.ArtifactPower:SetPoint("TOPLEFT", self, "TOPLEFT", -25 - C.unitframe.portrait_width, 28)
+					end
+				else
+					if C.unitframe.plugins_reputation_bar == true then
+						self.ArtifactPower:SetPoint("TOPLEFT", self, "TOPLEFT", -52 - C.unitframe.portrait_width, 28)
+					else
+						self.ArtifactPower:SetPoint("TOPLEFT", self, "TOPLEFT", -39 - C.unitframe.portrait_width, 28)
+					end
+				end
+			else
+				if T.level == MAX_PLAYER_LEVEL then
+					if C.unitframe.plugins_reputation_bar == true then
+						self.ArtifactPower:SetPoint("TOPLEFT", self, "TOPLEFT", -31, 28)
+					else
+						self.ArtifactPower:SetPoint("TOPLEFT", self, "TOPLEFT", -18, 28)
+					end
+				else
+					if C.unitframe.plugins_reputation_bar == true then
+						self.ArtifactPower:SetPoint("TOPLEFT", self, "TOPLEFT", -45, 28)
+					else
+						self.ArtifactPower:SetPoint("TOPLEFT", self, "TOPLEFT", -32, 28)
+					end
+				end
+			end
+			self.ArtifactPower:SetSize(7, 94)
+			self.ArtifactPower:SetOrientation("Vertical")
+			self.ArtifactPower:SetStatusBarTexture(C.media.texture)
+
+			self.ArtifactPower.bg = self.ArtifactPower:CreateTexture(nil, "BORDER")
+			self.ArtifactPower.bg:SetAllPoints()
+			self.ArtifactPower.bg:SetTexture(C.media.texture)
+			self.ArtifactPower.bg:SetVertexColor(T.color.r, T.color.g, T.color.b, 0.2)
+
+			self.ArtifactPower.color = {T.color.r, T.color.g, T.color.b}
+			self.ArtifactPower.offAlpha = 0
 		end
 
 		-- GCD spark
@@ -683,7 +713,7 @@ local function Shared(self, unit)
 
 		self.CounterBar:SetScript("OnValueChanged", function(_, value)
 			_, max = self.CounterBar:GetMinMaxValues()
-			r, g, b = oUF.ColorGradient(value, max, 1, 0, 0, 1, 1, 0, 0, 1, 0)
+			r, g, b = oUF:ColorGradient(value, max, 1, 0, 0, 1, 1, 0, 0, 1, 0)
 			self.CounterBar:SetStatusBarColor(r, g, b)
 			self.CounterBar.bg:SetVertexColor(r, g, b, 0.2)
 			self.CounterBar.Text:SetText(floor(value))
@@ -793,9 +823,9 @@ local function Shared(self, unit)
 				self.CPoints:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
 				self.CPoints:SetSize(217, 7)
 
-				for i = 1, 8 do
+				for i = 1, 6 do
 					self.CPoints[i] = CreateFrame("StatusBar", self:GetName().."_ComboBar", self.CPoints)
-					self.CPoints[i]:SetSize(213 / 8, 7)
+					self.CPoints[i]:SetSize(213 / 10, 7)
 					if i == 1 then
 						self.CPoints[i]:SetPoint("LEFT", self.CPoints)
 					else
@@ -810,10 +840,8 @@ local function Shared(self, unit)
 				self.CPoints[4]:SetStatusBarColor(0.9, 0.9, 0.1)
 				self.CPoints[5]:SetStatusBarColor(0.1, 0.9, 0.1)
 				self.CPoints[6]:SetStatusBarColor(0.1, 0.9, 0.1)
-				self.CPoints[7]:SetStatusBarColor(0.1, 0.9, 0.1)
-				self.CPoints[8]:SetStatusBarColor(0.1, 0.9, 0.1)
 
-				self.CPoints.Override = T.UpdateComboPointOld
+				self.CPoints.Override = T.UpdateComboPointTarget
 			end
 
 			-- Priest Range bar
@@ -837,31 +865,9 @@ local function Shared(self, unit)
 			end
 
 			-- Quest icon
-			self.QuestIcon = self.Health:CreateTexture(nil, "OVERLAY")
-			self.QuestIcon:SetSize(20, 20)
-			self.QuestIcon:SetPoint("RIGHT", self.Info, "LEFT", -10, 0)
-
-			-- Friendship bar
-			if C.unitframe.plugins_friendship_bar == true then
-				self.Friendship = CreateFrame("StatusBar", self:GetName().."_Friendship", self)
-				self.Friendship:CreateBackdrop("Default")
-				self.Friendship:SetPoint("BOTTOMLEFT", self, "TOPLEFT", 0, 7)
-				self.Friendship:SetSize(217, 7)
-				self.Friendship:SetStatusBarTexture(C.media.texture)
-				self.Friendship:SetStatusBarColor(1, 0, 0)
-
-				self.Friendship.bg = self.Friendship:CreateTexture(nil, "BORDER")
-				self.Friendship.bg:SetAllPoints()
-				self.Friendship.bg:SetTexture(C.media.texture)
-				self.Friendship.bg:SetVertexColor(1, 0, 0, 0.2)
-
-				self.Friendship.Tooltip = true
-
-				self.Friendship.Value = T.SetFontString(self.Friendship, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
-				self.Friendship.Value:SetPoint("CENTER")
-				self.Friendship.Value:SetTextColor(1, 1, 1)
-				self:Tag(self.Friendship.Value, "[friendshipstanding] - [curfriendship]/[maxfriendship]")
-			end
+			self.QuestIndicator = self.Health:CreateTexture(nil, "OVERLAY")
+			self.QuestIndicator:SetSize(20, 20)
+			self.QuestIndicator:SetPoint("RIGHT", self.Info, "LEFT", -10, 0)
 		end
 
 		if C.unitframe.plugins_combat_feedback == true then
@@ -984,10 +990,10 @@ local function Shared(self, unit)
 
 			self.Castbar.Text = T.SetFontString(self.Castbar, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
 			self.Castbar.Text:SetPoint("LEFT", self.Castbar, "LEFT", 2, 0)
-			self.Castbar.Text:SetPoint("RIGHT", self.Castbar.Time, "LEFT", -1, 0)
 			self.Castbar.Text:SetTextColor(1, 1, 1)
 			self.Castbar.Text:SetJustifyH("LEFT")
 			self.Castbar.Text:SetHeight(C.font.unit_frames_font_size)
+			self.Castbar.Text:SetWidth(self.Castbar:GetWidth() - 50)
 
 			if C.unitframe.castbar_icon == true and unit ~= "arena" then
 				self.Castbar.Button = CreateFrame("Frame", nil, self.Castbar)
@@ -1037,12 +1043,6 @@ local function Shared(self, unit)
 				self.Castbar.Latency:SetTextColor(1, 1, 1)
 				self.Castbar.Latency:SetPoint("TOPRIGHT", self.Castbar.Time, "BOTTOMRIGHT", 0, 0)
 				self.Castbar.Latency:SetJustifyH("RIGHT")
-
-				self:RegisterEvent("CURRENT_SPELL_CAST_CHANGED", function(self, event, caster) -- BETA Event check
-					if (caster == "player" or caster == "vehicle") then
-						self.Castbar.castSent = GetTime()
-					end
-				end)
 			end
 		end
 	end
@@ -1122,26 +1122,26 @@ local function Shared(self, unit)
 	end
 
 	if C.unitframe.show_boss and unit == "boss" then
-		self.AltPowerBar = CreateFrame("StatusBar", nil, self.Health)
-		self.AltPowerBar:SetFrameLevel(self.Health:GetFrameLevel() + 1)
-		self.AltPowerBar:SetHeight(4)
-		self.AltPowerBar:SetStatusBarTexture(C.media.texture)
-		self.AltPowerBar:SetStatusBarColor(1, 0, 0)
-		self.AltPowerBar:SetPoint("LEFT")
-		self.AltPowerBar:SetPoint("RIGHT")
-		self.AltPowerBar:SetPoint("TOP", self.Health, "TOP")
-		self.AltPowerBar:SetBackdrop({
+		self.AlternativePower = CreateFrame("StatusBar", nil, self.Health)
+		self.AlternativePower:SetFrameLevel(self.Health:GetFrameLevel() + 1)
+		self.AlternativePower:SetHeight(4)
+		self.AlternativePower:SetStatusBarTexture(C.media.texture)
+		self.AlternativePower:SetStatusBarColor(1, 0, 0)
+		self.AlternativePower:SetPoint("LEFT")
+		self.AlternativePower:SetPoint("RIGHT")
+		self.AlternativePower:SetPoint("TOP", self.Health, "TOP")
+		self.AlternativePower:SetBackdrop({
 			bgFile = C.media.blank,
 			edgeFile = C.media.blank,
 			tile = false, tileSize = 0, edgeSize = T.Scale(1),
 			insets = {left = 0, right = 0, top = 0, bottom = T.Scale(-1)}
 		})
-		self.AltPowerBar:SetBackdropColor(0, 0, 0)
-		self.AltPowerBar:SetBackdropBorderColor(0, 0, 0)
+		self.AlternativePower:SetBackdropColor(0, 0, 0)
+		self.AlternativePower:SetBackdropBorderColor(0, 0, 0)
 
-		self.AltPowerBar.text = T.SetFontString(self.AltPowerBar, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
-		self.AltPowerBar.text:SetPoint("CENTER", self.AltPowerBar, "CENTER", 0, 0)
-		self:Tag(self.AltPowerBar.text, "[AltPower]")
+		self.AlternativePower.text = T.SetFontString(self.AlternativePower, C.font.unit_frames_font, C.font.unit_frames_font_size, C.font.unit_frames_font_style)
+		self.AlternativePower.text:SetPoint("CENTER", self.AlternativePower, "CENTER", 0, 0)
+		self:Tag(self.AlternativePower.text, "[AltPower]")
 
 		if C.aura.boss_buffs == true then
 			self.Auras = CreateFrame("Frame", self:GetName().."_AuraBossBuff", self)
@@ -1178,10 +1178,10 @@ local function Shared(self, unit)
 
 	-- Raid marks
 	if C.raidframe.icons_raid_mark == true then
-		self.RaidIcon = self:CreateTexture(nil, "OVERLAY")
-		self.RaidIcon:SetParent(self.Health)
-		self.RaidIcon:SetSize((unit == "player" or unit == "target") and 15 or 12, (unit == "player" or unit == "target") and 15 or 12)
-		self.RaidIcon:SetPoint("TOP", self.Health, 0, 0)
+		self.RaidTargetIndicator = self:CreateTexture(nil, "OVERLAY")
+		self.RaidTargetIndicator:SetParent(self.Health)
+		self.RaidTargetIndicator:SetSize((unit == "player" or unit == "target") and 15 or 12, (unit == "player" or unit == "target") and 15 or 12)
+		self.RaidTargetIndicator:SetPoint("TOP", self.Health, 0, 0)
 	end
 
 	-- Debuff highlight
@@ -1368,7 +1368,7 @@ if C.unitframe.show_arena == true then
 						local _, spec, class = nil, "UNKNOWN", "UNKNOWN"
 
 						if s and s > 0 then
-							_, spec, _, _, _, _, class = GetSpecializationInfoByID(s)
+							_, spec, _, _, _, class = GetSpecializationInfoByID(s)
 						end
 
 						if class and spec then

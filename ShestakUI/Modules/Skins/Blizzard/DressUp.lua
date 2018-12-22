@@ -5,33 +5,80 @@ if C.skins.blizzard_frames ~= true then return end
 --	DressUp skin
 ----------------------------------------------------------------------------------------
 local function LoadSkin()
-	DressUpFrame:StripTextures(true)
-	DressUpFrame:CreateBackdrop("Transparent")
-	DressUpFrame.backdrop:SetPoint("TOPLEFT", 16, -12)
-	DressUpFrame.backdrop:SetPoint("BOTTOMRIGHT", -30, 76)
+	DressUpFrame:StripTextures()
+	DressUpFrame:SetTemplate("Transparent")
+	DressUpFramePortrait:Hide()
+	DressUpFrameInset:Hide()
 
-	DressUpFrameResetButton:SkinButton()
+	DressUpModel:CreateBackdrop("Default")
+	DressUpModel.backdrop:SetPoint("TOPLEFT", -3, 4)
+	DressUpModel.backdrop:SetPoint("BOTTOMRIGHT", 2, 1)
+	DressUpFrame.ModelBackground:SetDrawLayer("BACKGROUND", 3)
+
+	MaximizeMinimizeFrame:StripTextures()
+	MaximizeMinimizeFrame:SetSize(18, 18)
+	MaximizeMinimizeFrame:SetPoint("RIGHT", DressUpFrameCloseButton, "LEFT", -2, 0)
+
+	local MaximizeButton = MaximizeMinimizeFrame.MaximizeButton
+	MaximizeButton:StripTextures()
+	MaximizeButton:SetTemplate("Overlay")
+	MaximizeButton:SetHitRectInsets(1, 1, 1, 1)
+
+	MaximizeButton.minus = MaximizeButton:CreateTexture(nil, "OVERLAY")
+	MaximizeButton.minus:SetSize(7, 1)
+	MaximizeButton.minus:SetPoint("CENTER")
+	MaximizeButton.minus:SetTexture(C.media.blank)
+
+	MaximizeButton.plus = MaximizeButton:CreateTexture(nil, "OVERLAY")
+	MaximizeButton.plus:SetSize(1, 7)
+	MaximizeButton.plus:SetPoint("CENTER")
+	MaximizeButton.plus:SetTexture(C.media.blank)
+
+	MaximizeButton:HookScript("OnEnter", T.SetModifiedBackdrop)
+	MaximizeButton:HookScript("OnLeave", T.SetOriginalBackdrop)
+
+	local MinimizeButton = MaximizeMinimizeFrame.MinimizeButton
+	MinimizeButton:StripTextures()
+	MinimizeButton:SetTemplate("Overlay")
+	MinimizeButton:SetHitRectInsets(1, 1, 1, 1)
+
+	MinimizeButton.minus = MinimizeButton:CreateTexture(nil, "OVERLAY")
+	MinimizeButton.minus:SetSize(7, 1)
+	MinimizeButton.minus:SetPoint("CENTER")
+	MinimizeButton.minus:SetTexture(C.media.blank)
+
+	MinimizeButton:HookScript("OnEnter", T.SetModifiedBackdrop)
+	MinimizeButton:HookScript("OnLeave", T.SetOriginalBackdrop)
+
 	DressUpFrameCancelButton:SkinButton()
-	DressUpFrameUndressButton:SkinButton()
-	DressUpFrameOutfitDropDown.SaveButton:SkinButton()
-	T.SkinCloseButton(DressUpFrameCloseButton, DressUpFrame.backdrop)
-	DressUpFrameCancelButton:SetPoint("BOTTOMRIGHT", DressUpFrame.backdrop, "BOTTOMRIGHT", -4, 4)
+	DressUpFrameResetButton:SkinButton()
 	DressUpFrameResetButton:SetPoint("RIGHT", DressUpFrameCancelButton, "LEFT", -2, 0)
+	DressUpFrameUndressButton:SkinButton()
+
 	T.SkinDropDownBox(DressUpFrameOutfitDropDown)
 	DressUpFrameOutfitDropDown:SetSize(195, 34)
-
+	DressUpFrameOutfitDropDown.SaveButton:SkinButton()
 	DressUpFrameOutfitDropDown.SaveButton:ClearAllPoints()
 	DressUpFrameOutfitDropDown.SaveButton:SetPoint("RIGHT", DressUpFrameOutfitDropDown, 86, 4)
 
-	WardrobeOutfitFrame:StripTextures()
-	WardrobeOutfitFrame:CreateBackdrop("Transparent")
-	WardrobeOutfitFrame.backdrop:SetPoint("TOPLEFT", 2, -2)
-	WardrobeOutfitFrame.backdrop:SetPoint("BOTTOMRIGHT", -2, 2)
+	T.SkinCloseButton(DressUpFrameCloseButton, DressUpFrame.backdrop)
 
-	SideDressUpFrame:StripTextures(true)
+	SideDressUpFrame:StripTextures()
 	SideDressUpFrame:SetTemplate("Transparent")
 	SideDressUpModelResetButton:SkinButton()
 	T.SkinCloseButton(SideDressUpModelCloseButton, SideDressUpFrame)
+
+	WardrobeOutfitFrame:StripTextures(true)
+	WardrobeOutfitFrame:CreateBackdrop("Transparent")
+	WardrobeOutfitFrame.backdrop:SetPoint("TOPLEFT", WardrobeOutfitFrame, "TOPLEFT", 6, -6)
+	WardrobeOutfitFrame.backdrop:SetPoint("BOTTOMRIGHT", WardrobeOutfitFrame, "BOTTOMRIGHT", -6, 6)
+
+	WardrobeOutfitEditFrame:StripTextures(true)
+	WardrobeOutfitEditFrame:SetTemplate("Transparent")
+	WardrobeOutfitEditFrame.AcceptButton:SkinButton()
+	WardrobeOutfitEditFrame.CancelButton:SkinButton()
+	WardrobeOutfitEditFrame.DeleteButton:SkinButton()
+	T.SkinEditBox(WardrobeOutfitEditFrame.EditBox)
 end
 
 tinsert(T.SkinFuncs["ShestakUI"], LoadSkin)

@@ -42,11 +42,13 @@ _G.CHAT_FLAG_GM = "|cff4154F5"..L_CHAT_GM.."|r "
 _G.ERR_FRIEND_ONLINE_SS = "|Hplayer:%s|h[%s]|h "..L_CHAT_COME_ONLINE
 _G.ERR_FRIEND_OFFLINE_S = "[%s] "..L_CHAT_GONE_OFFLINE
 
--- Hide friends micro button
-FriendsMicroButton:Kill()
-
 -- Hide chat bubble menu button
 ChatFrameMenuButton:Kill()
+
+-- Kill channel and voice buttons
+ChatFrameChannelButton:Kill()
+ChatFrameToggleVoiceDeafenButton:Kill()
+ChatFrameToggleVoiceMuteButton:Kill()
 
 -- Set chat style
 local function SetChatStyle(frame)
@@ -89,11 +91,6 @@ local function SetChatStyle(frame)
 	_G[format("ChatFrame%sTabSelectedMiddle", id)]:Kill()
 	_G[format("ChatFrame%sTabSelectedRight", id)]:Kill()
 
-	-- Kills off the new method of handling the Chat Frame scroll buttons as well as the resize button
-	-- Note: This also needs to include the actual frame textures for the ButtonFrame onHover
-	_G[format("ChatFrame%sButtonFrameUpButton", id)]:Kill()
-	_G[format("ChatFrame%sButtonFrameDownButton", id)]:Kill()
-	_G[format("ChatFrame%sButtonFrameBottomButton", id)]:Kill()
 	_G[format("ChatFrame%sButtonFrameMinimizeButton", id)]:Kill()
 	_G[format("ChatFrame%sButtonFrame", id)]:Kill()
 
@@ -103,6 +100,10 @@ local function SetChatStyle(frame)
 	_G[format("ChatFrame%sEditBoxRight", id)]:Kill()
 
 	_G[format("ChatFrame%sTabGlow", id)]:Kill()
+
+	-- Kill scroll bar
+	frame.ScrollBar:Kill()
+	frame.ScrollToBottomButton:Kill()
 
 	-- Kill off editbox artwork
 	local a, b, c = select(6, _G[chat.."EditBox"]:GetRegions()) a:Kill() b:Kill() c:Kill()
@@ -139,16 +140,19 @@ local function SetChatStyle(frame)
 
 		-- Update border color according where we talk
 		hooksecurefunc("ChatEdit_UpdateHeader", function()
-			local type = _G[chat.."EditBox"]:GetAttribute("chatType")
-			if type == "CHANNEL" then
-				local id = GetChannelName(_G[chat.."EditBox"]:GetAttribute("channelTarget"))
-				if id == 0 then
+			local chatType = _G[chat.."EditBox"]:GetAttribute("chatType")
+			if not chatType then return end
+
+			local chanTarget = _G[chat.."EditBox"]:GetAttribute("channelTarget")
+			local chanName = chanTarget and GetChannelName(chanTarget)
+			if chanName and chatType == "CHANNEL" then
+				if chanName == 0 then
 					colorize(unpack(C.media.border_color))
 				else
-					colorize(ChatTypeInfo[type..id].r, ChatTypeInfo[type..id].g, ChatTypeInfo[type..id].b)
+					colorize(ChatTypeInfo[chatType..chanName].r, ChatTypeInfo[chatType..chanName].g, ChatTypeInfo[chatType..chanName].b)
 				end
 			else
-				colorize(ChatTypeInfo[type].r, ChatTypeInfo[type].g, ChatTypeInfo[type].b)
+				colorize(ChatTypeInfo[chatType].r, ChatTypeInfo[chatType].g, ChatTypeInfo[chatType].b)
 			end
 		end)
 	end
@@ -158,7 +162,7 @@ local function SetChatStyle(frame)
 		CombatLogQuickButtonFrame_Custom:StripTextures()
 		CombatLogQuickButtonFrame_Custom:CreateBackdrop("Transparent")
 		CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("TOPLEFT", 1, -4)
-		CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("BOTTOMRIGHT", 0, 0)
+		CombatLogQuickButtonFrame_Custom.backdrop:SetPoint("BOTTOMRIGHT", -22, 0)
 		T.SkinCloseButton(CombatLogQuickButtonFrame_CustomAdditionalFilterButton, CombatLogQuickButtonFrame_Custom.backdrop, " ", true)
 		CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetSize(12, 12)
 		CombatLogQuickButtonFrame_CustomAdditionalFilterButton:SetHitRectInsets (0, 0, 0, 0)
@@ -243,20 +247,29 @@ local function SetupChatPosAndFont(self)
 			if C.chat.combatlog ~= true then
 				FCF_DockFrame(chat)
 				ChatFrame2Tab:EnableMouse(false)
-				ChatFrame2Tab:SetText("")
-				ChatFrame2Tab.SetText = T.dummy
+				ChatFrame2TabText:Hide()
 				ChatFrame2Tab:SetWidth(0.001)
 				ChatFrame2Tab.SetWidth = T.dummy
+				FCF_DockUpdate()
 			end
 		end
 	end
 
-	-- Reposition battle.net popup over chat #1
-	BNToastFrame:HookScript("OnShow", function(self)
-		self:ClearAllPoints()
-		self:SetPoint(unpack(C.position.bn_popup))
-	end)
+	-- Reposition Quick Join Toast and battle.net popup
+	QuickJoinToastButton:ClearAllPoints()
+	QuickJoinToastButton:SetPoint(unpack(C.position.bn_popup))
+	QuickJoinToastButton:EnableMouse(false)
+	QuickJoinToastButton.ClearAllPoints = T.dummy
+	QuickJoinToastButton.SetPoint = T.dummy
+	QuickJoinToastButton:SetAlpha(0)
 end
+
+GeneralDockManagerOverflowButton:SetPoint("BOTTOMRIGHT", ChatFrame1, "TOPRIGHT", 0, 5)
+hooksecurefunc(GeneralDockManagerScrollFrame, "SetPoint", function(self, point, anchor, attachTo, x, y)
+	if anchor == GeneralDockManagerOverflowButton and x == 0 and y == 0 then
+		self:SetPoint(point, anchor, attachTo, 0, -4)
+	end
+end)
 
 local UIChat = CreateFrame("Frame")
 UIChat:RegisterEvent("ADDON_LOADED")

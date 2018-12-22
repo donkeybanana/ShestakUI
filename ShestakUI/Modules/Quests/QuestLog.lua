@@ -3,19 +3,23 @@ local T, C, L, _ = unpack(select(2, ...))
 ----------------------------------------------------------------------------------------
 --	Quest level
 ----------------------------------------------------------------------------------------
-hooksecurefunc("QuestLogQuests_Update", function()
-	for i, button in pairs(QuestMapFrame.QuestsFrame.Contents.Titles) do
-		if button:IsShown() then
-			local level = strmatch(GetQuestLink(button.questLogIndex), "quest:%d+:(%d+)")
-			if level then
-				local height = button.Text:GetHeight()
-				button.Text:SetFormattedText("[%d] %s", level, button.Text:GetText())
-				button.Check:SetPoint("LEFT", button.Text, button.Text:GetWrappedWidth() + 2, 0)
-				button:SetHeight(button:GetHeight() - height + button.Text:GetHeight())
-			end
-		end
-	end
-end)
+--BETA hooksecurefunc("QuestLogQuests_Update", function()
+	-- for i, button in pairs(QuestMapFrame.QuestsFrame.Contents.Titles) do
+		-- if button:IsShown() then
+			-- local link = GetQuestLink(button.questID)
+			-- if link then
+				-- local level = strmatch(link, "quest:%d+:(%d+)")
+				-- local title = button.Text:GetText()
+				-- if level and title then
+					-- local height = button.Text:GetHeight()
+					-- button.Text:SetFormattedText("[%d] %s", level, title)
+					-- button.Check:SetPoint("LEFT", button.Text, button.Text:GetWrappedWidth() + 2, 0)
+					-- button:SetHeight(button:GetHeight() - height + button.Text:GetHeight())
+				-- end
+			-- end
+		-- end
+	-- end
+-- end)
 
 ----------------------------------------------------------------------------------------
 --	Ctrl+Click to abandon a quest or Alt+Click to share a quest(by Suicidal Katt)
@@ -29,8 +33,9 @@ hooksecurefunc("QuestMapLogTitleButton_OnClick", function(self)
 	end
 end)
 
-hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderClick", function(block)
-	local questLogIndex = block.questLogIndex
+hooksecurefunc(QUEST_TRACKER_MODULE, "OnBlockHeaderClick", function(self, block)
+	local questLogIndex = block.id
+	SetAbandonQuest()
 	if IsControlKeyDown() then
 		local items = GetAbandonQuestItems()
 		if items then

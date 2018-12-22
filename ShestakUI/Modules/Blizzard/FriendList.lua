@@ -113,8 +113,16 @@ hooksecurefunc("WhoList_Update", function()
 		local classText = _G["WhoFrameButton"..i.."Class"]
 		local variableText = _G["WhoFrameButton"..i.."Variable"]
 
-		local name, guild, level, race, class, zone, classFileName = GetWhoInfo(index)
-		if name then
+		local info = C_FriendList.GetWhoInfo(index)
+		if info then
+			name = info.fullName
+			guild = info.fullGuildName
+			level = info.level
+			race = info.raceStr
+			class = info.classStr
+			zone = info.area
+			classFileName = info.filename
+
 			if zone == playerZone then
 				zone = "|cff00ff00"..zone
 			end
@@ -151,7 +159,7 @@ hooksecurefunc("WorldStateScoreFrame_Update", function()
 	local inArena = IsActiveBattlefieldArena()
 	local offset = FauxScrollFrame_GetOffset(WorldStateScoreScrollFrame)
 
-	for i = 1, MAX_WORLDSTATE_SCORE_BUTTONS do
+	for i = 1, GetNumBattlefieldScores() do
 		local index = offset + i
 		local name, _, _, _, _, faction, _, _, class = GetBattlefieldScore(index)
 		if name then
@@ -182,7 +190,9 @@ hooksecurefunc("WorldStateScoreFrame_Update", function()
 			end
 
 			local button = _G["WorldStateScoreButton"..i]
-			button.name.text:SetText(n)
+			if button then
+				button.name.text:SetText(n)
+			end
 		end
 	end
 end)

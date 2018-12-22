@@ -7,6 +7,27 @@ if C.skins.blizzard_frames ~= true then return end
 local function LoadSkin()
 	T.SkinCloseButton(CharacterFrameCloseButton)
 
+	-- Azerite Items
+	local function UpdateAzeriteItem(self)
+		if not self.styled then
+			self.AzeriteTexture:SetAlpha(0)
+			self.RankFrame.Texture:SetTexture("")
+			self.RankFrame.Label:SetFontObject("SystemFont_Outline_Small")
+			self.RankFrame.Label:SetPoint("CENTER", self.RankFrame.Texture, 0, 3)
+
+			self.styled = true
+		end
+		self:GetHighlightTexture():SetColorTexture(1, 1, 1, 0.3)
+		self:GetHighlightTexture():SetAllPoints()
+	end
+
+	local function UpdateAzeriteEmpoweredItem(self)
+		self.AzeriteTexture:SetAtlas("AzeriteIconFrame")
+		self.AzeriteTexture:SetPoint("TOPLEFT", 2, -2)
+		self.AzeriteTexture:SetPoint("BOTTOMRIGHT", -2, 2)
+		self.AzeriteTexture:SetDrawLayer("BORDER", 1)
+	end
+
 	local slots = {
 		"HeadSlot",
 		"NeckSlot",
@@ -28,8 +49,8 @@ local function LoadSkin()
 		"SecondaryHandSlot"
 	}
 
-	select(11, _G["CharacterMainHandSlot"]:GetRegions()):Hide()
-	select(11, _G["CharacterSecondaryHandSlot"]:GetRegions()):Hide()
+	select(14, _G["CharacterMainHandSlot"]:GetRegions()):Hide()
+	select(14, _G["CharacterSecondaryHandSlot"]:GetRegions()):Hide()
 
 	for _, i in pairs(slots) do
 		_G["Character"..i.."Frame"]:Hide()
@@ -48,6 +69,9 @@ local function LoadSkin()
 		icon:ClearAllPoints()
 		icon:SetPoint("TOPLEFT", 2, -2)
 		icon:SetPoint("BOTTOMRIGHT", -2, 2)
+
+		hooksecurefunc(slot, "DisplayAsAzeriteItem", UpdateAzeriteItem)
+		hooksecurefunc(slot, "DisplayAsAzeriteEmpoweredItem", UpdateAzeriteEmpoweredItem)
 	end
 
 	-- Strip Textures
@@ -161,44 +185,18 @@ local function LoadSkin()
 			object.icon:SetSize(36, 36)
 			object.icon.SetSize = T.dummy
 		end
-		GearManagerDialogPopup:StripTextures()
-		GearManagerDialogPopup:SetTemplate("Transparent")
-		GearManagerDialogPopup:SetPoint("TOPLEFT", PaperDollFrame, "TOPRIGHT", 3, 0)
-		GearManagerDialogPopupScrollFrame:StripTextures()
-		GearManagerDialogPopupEditBox:StripTextures(true)
-		GearManagerDialogPopupEditBox:SetTemplate("Overlay")
-		GearManagerDialogPopupEditBox:SetTextInsets(3, 0, 0, 0)
-		GearManagerDialogPopupOkay:SkinButton()
-		GearManagerDialogPopupCancel:SkinButton()
-		GearManagerDialogPopupScrollFrame:SetPoint("TOPRIGHT", -34, -64)
-
-		for i = 1, NUM_GEARSET_ICONS_SHOWN do
-			local button = _G["GearManagerDialogPopupButton"..i]
-			local icon = button.icon
-
-			if button then
-				button:StripTextures()
-				button:StyleButton(true)
-
-				icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-				_G["GearManagerDialogPopupButton"..i.."Icon"]:SetTexture(nil)
-
-				icon:ClearAllPoints()
-				icon:SetPoint("TOPLEFT", 2, -2)
-				icon:SetPoint("BOTTOMRIGHT", -2, 2)
-				button:SetFrameLevel(button:GetFrameLevel() + 2)
-				if not button.backdrop then
-					button:CreateBackdrop("Default")
-					button.backdrop:SetAllPoints()
-				end
-			end
-		end
 	end)
+
+	T.SkinIconSelectionFrame(GearManagerDialogPopup, NUM_GEARSET_ICONS_SHOWN, "GearManagerDialogPopupButton", frameNameOverride)
 
 	-- Handle Tabs at bottom of character frame
 	for i = 1, 4 do
 		T.SkinTab(_G["CharacterFrameTab"..i])
 	end
+
+	T.SkinCloseButton(CharacterFrame.ReputationTabHelpBox.CloseButton)
+	CharacterFrame.ReputationTabHelpBox:StripTextures()
+	CharacterFrame.ReputationTabHelpBox:CreateBackdrop("Transparent")
 
 	-- Buttons used to toggle between equipment manager, titles, and character stats
 	local function FixSidebarTabCoords()

@@ -98,7 +98,6 @@ if T.name == "Oz" and T.realm == "Pozzo dell'Eternità" then
 	C["tooltip"].average_lvl = true
 	C["tooltip"].raid_icon = true
 	C["tooltip"].who_targetting = true
-	C["tooltip"].item_transmogrify = true
 	C["chat"].background = true
 	C["chat"].filter = false
 	C["chat"].chat_bar = true
@@ -148,27 +147,27 @@ end
 ----------------------------------------------------------------------------------------
 --	Sw2rT1 Config
 ----------------------------------------------------------------------------------------
-if (T.name == "Чаккичак" or T.name == "Чаккноррис" or T.name == "Чакерс"
-or T.name == "Чакернаут" or T.name == "Чаккис" or T.name == "Эзэрвуд" or T.name == "Какес") and T.realm == "Подземье" then
+if Sw2rT1 then
 	C["general"].welcome_message = false
 	C["misc"].shift_marking = false
 	C["misc"].raid_tools = false
 	C["misc"].hide_bg_spam = true
 	C["misc"].disenchanting = true
+	C["misc"].hide_talking_head = true
 	C["announcements"].pull_countdown = false
 	C["automation"].accept_invite = true
-	C["automation"].accept_quest = true
+	--C["automation"].accept_quest = true
 	C["automation"].auto_collapse = true
 	C["automation"].currency_cap = true
 	C["skins"].blizzard_frames = true
 	C["skins"].minimap_buttons = true
 	C["skins"].dbm = true
+	C["skins"].weak_auras = true
 	C["combattext"].crit_prefix = ""
 	C["combattext"].crit_postfix = ""
 	C["raidcooldown"].enable = false
 	C["threat"].enable = false
 	C["tooltip"].item_icon = true
-	C["tooltip"].hide_combat = true
 	C["tooltip"].title = true
 	C["tooltip"].raid_icon = true
 	C["tooltip"].average_lvl = true
@@ -178,8 +177,6 @@ or T.name == "Чакернаут" or T.name == "Чаккис" or T.name == "Эз
 	C["chat"].damage_meter_spam = true
 	C["bag"].ilvl = true
 	C["map"].fog_of_war = true
-	C["nameplate"].combat = true
-	C["aura"].focus_debuffs = true
 	C["unitframe"].enemy_health_color = false
 	C["unitframe"].castbar_latency = false
 	C["raidframe"].raid_groups = 6
@@ -257,11 +254,4 @@ if IsWetxius then
 		C["combattext"].heal_treshold = 1000
 		C["stats"].experience = false
 	end
-
-	local frame = CreateFrame("Frame")
-	frame:RegisterEvent("PLAYER_LOGIN")
-	frame:SetScript("OnEvent", function()
-		SetCVar("lootUnderMouse", 1)
-		SetCVar("cameraDistanceMoveSpeed", 50)
-	end)
 end

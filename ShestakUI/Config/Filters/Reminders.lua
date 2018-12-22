@@ -5,13 +5,13 @@ local T, C, L, _ = unpack(select(2, ...))
 --	Example: Well Fed -> http://www.wowhead.com/spell=104280
 --	Take the number ID at the end of the URL, and add it to the list
 ----------------------------------------------------------------------------------------
-if C.reminder.raid_buffs_enable == true then
+if C.reminder.raid_buffs_enable == true or C.announcements.flask_food == true then
 	T.ReminderBuffs = {
 		Flask = {
-			188033,	-- Flask of the Seventh Demon (Agility)
-			188034,	-- Flask of the Countless Armies (Strenght)
-			188035,	-- Flask of Ten Thousand Scars (Stamina)
-			188031,	-- Flask of the Whispered Pact (Intellect)
+			251836,	-- Flask of the Currents (Agility)
+			251839,	-- Flask of the Undertow (Strenght)
+			251838,	-- Flask of the Vast Horizon (Stamina)
+			251837,	-- Flask of Endless Fathoms (Intellect)
 		},
 		BattleElixir = {
 			--spellID,	-- Spell name
@@ -23,7 +23,30 @@ if C.reminder.raid_buffs_enable == true then
 		Food = {
 			104280,	-- Well Fed
 		},
+		Stamina = {
+			21562,	-- Power Word: Fortitude
+			264764,	-- War-Scroll of Fortitude
+		},
+		Custom = {
+			-- spellID,	-- Spell name
+		}
 	}
+
+	-- Caster buffs
+	function T.ReminderCasterBuffs()
+		Spell4Buff = {	-- Intellect
+			1459,	-- Arcane Intellect
+			264760,	-- War-Scroll of Intellect
+		}
+	end
+
+	-- Physical buffs
+	function T.ReminderPhysicalBuffs()
+		Spell4Buff = {	-- Attack Power
+			6673,	-- Battle Shout
+			264761,	-- War-Scroll of Battle Shout
+		}
+	end
 end
 
 ----------------------------------------------------------------------------------------
@@ -45,41 +68,32 @@ end
 		level - the minimum level you must be (most of the time we don't need to use this because it will register the spell learned event if you don't know the spell, but in some cases it may be useful)
 
 	Additional Checks: (Note we always run a check when gaining/losing an aura)
+		combat - check when entering combat
 		instance - check when entering a party/raid instance
 		pvp - check when entering a bg/arena
-		combat - check when entering combat
 
 	For every group created a new frame is created, it's a lot easier this way.
 ]]--------------------------------------------------------------------------------------
 if C.reminder.solo_buffs_enable == true then
 	T.ReminderSelfBuffs = {
-		PALADIN = {
-			[1] = {	-- Greater Blessing of Kings
+		MAGE = {
+			[1] = {	-- Intellect group
 				["spells"] = {
-					203538,	-- Greater Blessing of Kings
+					1459,	-- Arcane Intellect
 				},
-				["spec"] = 3,		-- Only Ret paladin can buff
 				["combat"] = true,
 				["instance"] = true,
 				["pvp"] = true,
 			},
-			[2] = {	-- Greater Blessing of Might
+		},
+		PRIEST = {
+			[1] = {	-- Stamina group
 				["spells"] = {
-					203528,	-- Greater Blessing of Might
+					21562,	-- Power Word: Fortitude
 				},
-				["spec"] = 3,		-- Only Ret paladin can buff
 				["combat"] = true,
 				["instance"] = true,
-				["pvp"] = true,
-			},
-			[3] = {	-- Greater Blessing of Wisdom
-				["spells"] = {
-					203539,	-- Greater Blessing of Wisdom
-				},
-				["spec"] = 3,		-- Only Ret paladin can buff
-				["combat"] = true,
-				["instance"] = true,
-				["pvp"] = true,
+				["pvp"] = true
 			},
 		},
 		ROGUE = {
@@ -99,6 +113,16 @@ if C.reminder.solo_buffs_enable == true then
 					108211,	-- Leeching Poison
 				},
 				["spec"] = 1,		-- Only Assassination have poisen now
+				["combat"] = true,
+				["instance"] = true,
+				["pvp"] = true,
+			},
+		},
+		WARRIOR = {
+			[1] = {	-- Battle Shout group
+				["spells"] = {
+					6673,	-- Battle Shout
+				},
 				["combat"] = true,
 				["instance"] = true,
 				["pvp"] = true,

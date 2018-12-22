@@ -33,29 +33,16 @@ local function LoadSkin()
 		SideDressUpFrame:SetPoint("TOPLEFT", AuctionFrame, "TOPRIGHT", 3, 0)
 	end)
 
-	-- WoW Token Tutorial Frame
+	-- WoW Token
+	WowTokenGameTimeTutorial.NineSlice:Hide()
+	WowTokenGameTimeTutorial.TitleBg:Hide()
 	WowTokenGameTimeTutorial:CreateBackdrop("Transparent")
+	WowTokenGameTimeTutorialInset.NineSlice:Hide()
+	WowTokenGameTimeTutorialBg:Hide()
+	StoreButton:SkinButton()
 	T.SkinCloseButton(WowTokenGameTimeTutorial.CloseButton)
-	WowTokenGameTimeTutorial.Inset.InsetBorderBottom:SetAlpha(0)
-	WowTokenGameTimeTutorial.Inset.InsetBorderRight:SetAlpha(0)
-	WowTokenGameTimeTutorial.Inset.InsetBorderBottomLeft:SetAlpha(0)
-	WowTokenGameTimeTutorial.Inset.InsetBorderBottomRight:SetAlpha(0)
-	WowTokenGameTimeTutorial.Inset.InsetBorderTopLeft:SetAlpha(0)
-	WowTokenGameTimeTutorial.Inset.InsetBorderLeft:SetAlpha(0)
-	WowTokenGameTimeTutorial.Inset.InsetBorderTopRight:SetAlpha(0)
-	WowTokenGameTimeTutorial.Inset.InsetBorderTop:SetAlpha(0)
-	WowTokenGameTimeTutorial.Inset.Bg:SetAlpha(0)
-	WowTokenGameTimeTutorialTitleBg:SetAlpha(0)
-	WowTokenGameTimeTutorialBg:SetAlpha(0)
-	WowTokenGameTimeTutorialTopRightCorner:SetAlpha(0)
-	WowTokenGameTimeTutorialTopLeftCorner:SetAlpha(0)
-	WowTokenGameTimeTutorialTopBorder:SetAlpha(0)
-	WowTokenGameTimeTutorialBotLeftCorner:SetAlpha(0)
-	WowTokenGameTimeTutorialBotRightCorner:SetAlpha(0)
-	WowTokenGameTimeTutorialBottomBorder:SetAlpha(0)
-	WowTokenGameTimeTutorialLeftBorder:SetAlpha(0)
-	WowTokenGameTimeTutorialRightBorder:SetAlpha(0)
 
+	BrowseWowTokenResults.Buyout:SkinButton(true)
 	local Token = BrowseWowTokenResultsToken
 	Token.ItemBorder:Hide()
 	Token.IconBorder:Hide()
@@ -77,16 +64,16 @@ local function LoadSkin()
 	AuctionProgressFrameCancelButton:SetSize(28, 28)
 	AuctionProgressFrameCancelButton:SetPoint("LEFT", AuctionProgressBar, "RIGHT", 8, 0)
 
-	--BETA AuctionProgressBarIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+	AuctionProgressBar.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
-	-- local backdrop = CreateFrame("Frame", nil, AuctionProgressBarIcon:GetParent())
-	-- backdrop:SetPoint("TOPLEFT", AuctionProgressBarIcon, "TOPLEFT", -2, 2)
-	-- backdrop:SetPoint("BOTTOMRIGHT", AuctionProgressBarIcon, "BOTTOMRIGHT", 2, -2)
-	-- backdrop:SetTemplate("Default")
-	-- AuctionProgressBarIcon:SetParent(backdrop)
+	local backdrop = CreateFrame("Frame", nil, AuctionProgressBar.Icon:GetParent())
+	backdrop:SetPoint("TOPLEFT", AuctionProgressBar.Icon, "TOPLEFT", -2, 2)
+	backdrop:SetPoint("BOTTOMRIGHT", AuctionProgressBar.Icon, "BOTTOMRIGHT", 2, -2)
+	backdrop:SetTemplate("Default")
+	AuctionProgressBar.Icon:SetParent(backdrop)
 
-	-- AuctionProgressBarText:ClearAllPoints()
-	-- AuctionProgressBarText:SetPoint("CENTER")
+	AuctionProgressBar.Text:ClearAllPoints()
+	AuctionProgressBar.Text:SetPoint("CENTER")
 
 	AuctionProgressBar:StripTextures()
 	AuctionProgressBar:CreateBackdrop("Default")
@@ -115,8 +102,6 @@ local function LoadSkin()
 	for _, button in pairs(buttons) do
 		_G[button]:SkinButton(true)
 	end
-	BrowseWowTokenResults.Buyout:SkinButton(true)
-	StoreButton:SkinButton()
 
 	-- Fix Button Positions
 	AuctionsCloseButton:SetPoint("BOTTOMRIGHT", AuctionFrameAuctions, "BOTTOMRIGHT", 66, 10)
@@ -459,16 +444,48 @@ local function LoadSkin()
 
 	Atr_HeadingsBar:CreateBackdrop("Overlay")
 	Atr_HeadingsBar.backdrop:SetPoint("TOPLEFT", 0, -25)
-	Atr_HeadingsBar.backdrop:SetPoint("BOTTOMRIGHT", 3, -182)
+	Atr_HeadingsBar.backdrop:SetPoint("BOTTOMRIGHT", 3, -183)
 
 	Atr_SellControls:CreateBackdrop("Overlay")
 	Atr_SellControls.backdrop:SetPoint("TOPLEFT", -2, 0)
-	Atr_SellControls.backdrop:SetPoint("BOTTOMRIGHT", 24, 1)
+	Atr_SellControls.backdrop:SetPoint("BOTTOMRIGHT", 25, 0)
 
-	Atr_Hlist:SetTemplate("Overlay")
-	Atr_Hlist:SetWidth(196)
-	Atr_Hlist:ClearAllPoints()
-	Atr_Hlist:SetPoint("TOPLEFT", -195, -75)
+	Atr_DropDownSL:SetPoint("TOPLEFT", Atr_Main_Panel, "TOPLEFT", -190, -41)
+
+	Atr_Hlist:CreateBackdrop("Overlay")
+	Atr_Hlist.backdrop:SetPoint("TOPLEFT", -2, 0)
+	Atr_Hlist.backdrop:SetPoint("BOTTOMRIGHT", 0, 2)
+	Atr_Hlist:SetWidth(195)
+
+	Atr_Hlist_ScrollFrameScrollBar:ClearAllPoints()
+	Atr_Hlist_ScrollFrameScrollBar:SetPoint("TOPRIGHT", Atr_Hlist, "TOPRIGHT", -5, -20)
+	Atr_Hlist_ScrollFrameScrollBar:SetPoint("BOTTOMRIGHT", Atr_Hlist, "BOTTOMRIGHT", -5, 22)
+	T.SkinScrollBar(Atr_Hlist_ScrollFrameScrollBar)
+
+	T.SkinScrollBar(AuctionatorScrollFrameScrollBar)
+
+	hooksecurefunc("AuctionFrameTab_OnClick", function(self, button, down, index)
+		local index = self:GetID()
+		if index == 4 then
+			Atr_Hlist:SetPoint("TOPLEFT", -193, -67)
+		else
+			Atr_Hlist:SetHeight(337)
+			Atr_Hlist_ScrollFrame:SetHeight(337)
+			Atr_Hlist:SetPoint("TOPLEFT", -193, -75)
+		end
+	end)
+
+	Atr_AddToSListButton:SetWidth(97)
+	Atr_RemFromSListButton:SetWidth(97)
+	Atr_SrchSListButton:SetWidth(197)
+	Atr_MngSListsButton:SetWidth(197)
+	Atr_NewSListButton:SetWidth(197)
+
+	Atr_AddToSListButton:SetPoint("TOPLEFT", Atr_Main_Panel, "TOPLEFT", -195, -321)
+	Atr_RemFromSListButton:SetPoint("TOPLEFT", Atr_Main_Panel, "TOPLEFT", -95, -321)
+	Atr_SrchSListButton:SetPoint("TOPLEFT", Atr_Main_Panel, "TOPLEFT", -195, -344)
+	Atr_MngSListsButton:SetPoint("TOPLEFT", Atr_Main_Panel, "TOPLEFT", -195, -367)
+	Atr_NewSListButton:SetPoint("TOPLEFT", Atr_Main_Panel, "TOPLEFT", -195, -390)
 
 	Atr_Hilite1:CreateBackdrop("Overlay")
 	Atr_Hilite1.backdrop:SetPoint("TOPLEFT", 1, -3)

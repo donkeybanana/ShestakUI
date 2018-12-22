@@ -93,9 +93,13 @@ local function LoadSkin()
 	specspell2.specIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 	specspell2.specIcon:SetParent(specspell2.backdrop)
 
+	T.SkinScrollBar(PlayerTalentFrameSpecializationSpellScrollFrameScrollBar)
+	PlayerTalentFrameSpecializationSpellScrollFrameScrollBar:SetPoint("TOPLEFT", PlayerTalentFrameSpecializationSpellScrollFrame, "TOPRIGHT", -16, -16)
+
 	hooksecurefunc("PlayerTalentFrame_UpdateSpecFrame", function(self, spec)
 		local playerTalentSpec = GetSpecialization(nil, self.isPet, PlayerSpecTab2:GetChecked() and 2 or 1)
 		local shownSpec = spec or playerTalentSpec or 1
+		local numSpecs = GetNumSpecializations(nil, self.isPet)
 
 		local id, _, _, icon = GetSpecializationInfo(shownSpec, nil, self.isPet)
 		local scrollChild = self.spellsScroll.child
@@ -104,30 +108,34 @@ local function LoadSkin()
 
 		local index = 1
 		local bonuses
+		local bonusesIncrement = 1
 		if self.isPet then
-			bonuses = {GetSpecializationSpells(shownSpec, nil, self.isPet)}
+			bonuses = {GetSpecializationSpells(shownSpec, nil, self.isPet, true)}
+			bonusesIncrement = 2
 		else
-			bonuses = SPEC_SPELLS_DISPLAY[id]
+			bonuses = C_SpecializationInfo.GetSpellsDisplay(id)
 		end
-		for i = 1, #bonuses, 2 do
-			local frame = scrollChild["abilityButton"..index]
-			local _, icon = GetSpellTexture(bonuses[i])
-			frame.icon:SetTexture(icon)
-			if not frame.reskinned then
-				frame.reskinned = true
-				frame.ring:Hide()
-				frame:CreateBackdrop("Default")
-				frame.backdrop:SetPoint("TOPLEFT", 2, -2)
-				frame.backdrop:SetPoint("BOTTOMRIGHT", -2, 2)
-				frame.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
-				frame.icon:SetParent(frame.backdrop)
-				frame.icon:SetPoint("TOPLEFT", 2, -2)
-				frame.icon:SetPoint("BOTTOMRIGHT", -2, 2)
+		if bonuses then
+			for i = 1, #bonuses, bonusesIncrement do
+				local frame = scrollChild["abilityButton"..index]
+				local _, icon = GetSpellTexture(bonuses[i])
+				frame.icon:SetTexture(icon)
+				if not frame.reskinned then
+					frame.reskinned = true
+					frame.ring:Hide()
+					frame:CreateBackdrop("Default")
+					frame.backdrop:SetPoint("TOPLEFT", 2, -2)
+					frame.backdrop:SetPoint("BOTTOMRIGHT", -2, 2)
+					frame.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+					frame.icon:SetParent(frame.backdrop)
+					frame.icon:SetPoint("TOPLEFT", 2, -2)
+					frame.icon:SetPoint("BOTTOMRIGHT", -2, 2)
+				end
+				index = index + 1
 			end
-			index = index + 1
 		end
 
-		for i = 1, GetNumSpecializations(nil, self.isPet) do
+		for i = 1, numSpecs do
 			local bu = self["specButton"..i]
 			if bu.selected then
 				bu.backdrop:SetBackdropBorderColor(1, 0.82, 0, 1)
@@ -201,6 +209,9 @@ local function LoadSkin()
 			bu.backdrop:SetPoint("TOPLEFT", ic, -2, 2)
 			bu.backdrop:SetPoint("BOTTOMRIGHT", ic, 2, -2)
 
+			bu.knownSelection:SetAlpha(0)
+			bu.GlowFrame:StripTextures()
+
 			ic:SetDrawLayer("ARTWORK")
 			ic:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 
@@ -251,11 +262,53 @@ local function LoadSkin()
 		PlayerSpecTab2:SetPoint("TOP", PlayerSpecTab1, "BOTTOM")
 	end)
 
-	-- PVPTalents
-	PlayerTalentFramePVPTalents.XPBar.PrestigeReward.Accept:SkinButton()
+	-- PvP Talents
+	PlayerTalentFrameTalentsPvpTalentButton:SetSize(20, 20)
+	PlayerTalentFrameTalentsPvpTalentButton:SkinButton()
+	PlayerTalentFrameTalentsPvpTalentButtonIcon:SetTexCoord(0.3, 0.29, 0.3, 0.79, 0.65, 0.29, 0.65, 0.79)
 
-	PlayerTalentFramePVPTalentsBg:Hide()
-	PlayerTalentFramePVPTalents.Talents:DisableDrawLayer("BORDER")
+	PlayerTalentFrameTalents.PvpTalentFrame:StripTextures()
+	PlayerTalentFrameTalentsPvpTalentFrameTalentList:StripTextures()
+	PlayerTalentFrameTalentsPvpTalentFrameTalentList:CreateBackdrop("Transparent")
+	T.SkinScrollBar(PlayerTalentFrameTalentsPvpTalentFrameTalentListScrollFrameScrollBar)
+
+	local TalentList_CloseButton = select(4, PlayerTalentFrameTalents.PvpTalentFrame.TalentList:GetChildren())
+	if TalentList_CloseButton and TalentList_CloseButton:HasScript("OnClick") then
+		TalentList_CloseButton:SkinButton()
+	end
+
+	for _, button in pairs(PlayerTalentFrameTalents.PvpTalentFrame.TalentList.ScrollFrame.buttons) do
+		button:DisableDrawLayer("BACKGROUND")
+		button:StyleButton()
+		button:CreateBackdrop("Overlay")
+		button.Selected:SetTexture("")
+		button.backdrop:SetAllPoints()
+
+		button.Icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+		button.Icon:SetSize(28, 28)
+		button.Icon:SetPoint("LEFT", button, "LEFT", 6, 0)
+
+		button.border = CreateFrame("Frame", nil, button)
+		button.border:CreateBackdrop("Default")
+		button.border.backdrop:SetPoint("TOPLEFT", button.Icon, -2, 2)
+		button.border.backdrop:SetPoint("BOTTOMRIGHT", button.Icon, 2, -2)
+
+		button.selectedTexture = button:CreateTexture(nil, 'ARTWORK')
+		button.selectedTexture:SetInside(button)
+		button.selectedTexture:SetColorTexture(1, 0.82, 0, 0.3)
+		button.selectedTexture:SetShown(button.Selected:IsShown())
+	end
+
+	hooksecurefunc(PlayerTalentFrameTalents.PvpTalentFrame.TalentList, "Update", function(self)
+		for _, Button in pairs(PlayerTalentFrameTalents.PvpTalentFrame.TalentList.ScrollFrame.buttons) do
+			if not Button.selectedTexture then return end
+			if Button.Selected:IsShown() then
+				Button.selectedTexture:SetShown(true)
+			else
+				Button.selectedTexture:Hide()
+			end
+		end
+	end)
 end
 
 T.SkinFuncs["Blizzard_TalentUI"] = LoadSkin

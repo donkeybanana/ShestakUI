@@ -3,6 +3,7 @@
 ----------------------------------------------------------------------------------------
 local realm = GetRealmName()
 local name = UnitName("player")
+local GlobalHeight = 545
 
 local ALLOWED_GROUPS = {
 	["general"] = 1,
@@ -30,8 +31,8 @@ local ALLOWED_GROUPS = {
 	["unitframe_class_bar"] = 23,
 	["raidframe"] = 24,
 	["toppanel"] = 25,
-	["error"] = 26,
-	["stats"] = 27,
+	["stats"] = 26,
+	["error"] = 27,
 }
 
 local function Local(o)
@@ -67,6 +68,8 @@ local function Local(o)
 	if o == "UIConfigmiscarmory_link" then o = L_GUI_MISC_ARMORY_LINK end
 	if o == "UIConfigmiscmerchant_itemlevel" then o = L_GUI_MISC_MERCHANT_ITEMLEVEL end
 	if o == "UIConfigmiscminimize_mouseover" then o = L_GUI_MISC_MINIMIZE_MOUSEOVER end
+	if o == "UIConfigmischide_banner" then o = L_GUI_MISC_HIDE_BANNER end
+	if o == "UIConfigmischide_talking_head" then o = L_GUI_MISC_HIDE_TALKING_HEAD end
 
 	-- Announcements options
 	if o == "UIConfigannouncements" then o = L_GUI_ANNOUNCEMENTS end
@@ -74,7 +77,6 @@ local function Local(o)
 	if o == "UIConfigannouncementsinterrupts" then o = L_GUI_ANNOUNCEMENTS_INTERRUPTS end
 	if o == "UIConfigannouncementsspells" then o = L_GUI_ANNOUNCEMENTS_SPELLS end
 	if o == "UIConfigannouncementsspells_from_all" then o = L_GUI_ANNOUNCEMENTS_SPELLS_FROM_ALL end
-	if o == "UIConfigannouncementslightwell" then o = L_GUI_ANNOUNCEMENTS_LIGHTWELL end
 	if o == "UIConfigannouncementstoys" then o = L_GUI_ANNOUNCEMENTS_TOY_TRAIN end
 	if o == "UIConfigannouncementssays_thanks" then o = L_GUI_ANNOUNCEMENTS_SAYS_THANKS end
 	if o == "UIConfigannouncementspull_countdown" then o = L_GUI_ANNOUNCEMENTS_PULL_COUNTDOWN end
@@ -91,7 +93,6 @@ local function Local(o)
 	if o == "UIConfigautomationrelease" then o = L_GUI_AUTOMATION_RELEASE end
 	if o == "UIConfigautomationscreenshot" then o = L_GUI_AUTOMATION_SCREENSHOT end
 	if o == "UIConfigautomationsolve_artifact" then o = L_GUI_AUTOMATION_SOLVE_ARTIFACT end
-	if o == "UIConfigautomationchefs_hat" then o = L_GUI_AUTOMATION_CHEFS_HAT end
 	if o == "UIConfigautomationaccept_invite" then o = L_GUI_AUTOMATION_ACCEPT_INVITE end
 	if o == "UIConfigautomationdecline_duel" then o = L_GUI_AUTOMATION_DECLINE_DUEL end
 	if o == "UIConfigautomationaccept_quest" then o = L_GUI_AUTOMATION_ACCEPT_QUEST end
@@ -105,7 +106,6 @@ local function Local(o)
 	if o == "UIConfigautomationcurrency_cap" then o = L_GUI_AUTOMATION_CURRENCY_CAP end
 	if o == "UIConfigautomationbuff_on_scroll" then o = L_GUI_AUTOMATION_BUFF_ON_SCROLL end
 	if o == "UIConfigautomationopen_items" then o = L_GUI_AUTOMATION_OPEN_ITEMS end
-	if o == "UIConfigautomationbanner_hide" then o = L_GUI_AUTOMATION_BANNER_HIDE end
 
 	-- Skins options
 	if o == "UIConfigskins" then o = L_GUI_SKINS end
@@ -127,7 +127,6 @@ local function Local(o)
 	if o == "UIConfigskinsovale" then o = L_GUI_SKINS_OVALE end
 	if o == "UIConfigskinsclique" then o = L_GUI_SKINS_CLIQUE end
 	if o == "UIConfigskinsace3" then o = L_GUI_SKINS_ACE3 end
-	if o == "UIConfigskinspallypower" then o = L_GUI_SKINS_PP end
 	if o == "UIConfigskinscapping" then o = L_GUI_SKINS_CAPPING end
 	if o == "UIConfigskinscool_line" then o = L_GUI_SKINS_COOL_LINE end
 	if o == "UIConfigskinsatlasloot" then o = L_GUI_SKINS_ATLASLOOT end
@@ -139,6 +138,11 @@ local function Local(o)
 	if o == "UIConfigskinsweak_auras" then o = L_GUI_SKINS_WEAK_AURAS end
 	if o == "UIConfigskinsskada" then o = L_GUI_SKINS_SKADA end
 	if o == "UIConfigskinsmy_role_play" then o = L_GUI_SKINS_MY_ROLE_PLAY end
+	if o == "UIConfigskinsarh" then o = L_GUI_SKINS_ARH end
+	if o == "UIConfigskinspostal" then o = L_GUI_SKINS_POSTAL end
+	if o == "UIConfigskinsopie" then o = L_GUI_SKINS_OPIE end
+	if o == "UIConfigskinsrematch" then o = L_GUI_SKINS_REMATCH end
+	if o == "UIConfigskinsls_toasts" then o = L_GUI_SKINS_LS_TOASTS end
 
 	-- Combat text options
 	if o == "UIConfigcombattext" then o = L_GUI_COMBATTEXT end
@@ -242,7 +246,6 @@ local function Local(o)
 	if o == "UIConfigtooltipitem_count" then o = L_GUI_TOOLTIP_ITEM_COUNT end
 	if o == "UIConfigtooltipunit_role" then o = L_GUI_TOOLTIP_UNIT_ROLE end
 	if o == "UIConfigtooltipinstance_lock" then o = L_GUI_TOOLTIP_INSTANCE_LOCK end
-	if o == "UIConfigtooltipitem_transmogrify" then o = L_GUI_TOOLTIP_ITEM_TRANSMOGRIFY end
 
 	-- Chat options
 	if o == "UIConfigchat" then o = SOCIALS end
@@ -302,6 +305,7 @@ local function Local(o)
 	if o == "UIConfignameplateenable" then o = L_GUI_NAMEPLATE_ENABLE end
 	if o == "UIConfignameplateheight" then o = L_GUI_NAMEPLATE_HEIGHT end
 	if o == "UIConfignameplatewidth" then o = L_GUI_NAMEPLATE_WIDTH end
+	if o == "UIConfignameplatedistance" then o = L_GUI_NAMEPLATE_DISTANCE end
 	if o == "UIConfignameplatead_height" then o = L_GUI_NAMEPLATE_AD_HEIGHT end
 	if o == "UIConfignameplatead_width" then o = L_GUI_NAMEPLATE_AD_WIDTH end
 	if o == "UIConfignameplatecombat" then o = L_GUI_NAMEPLATE_COMBAT end
@@ -311,15 +315,19 @@ local function Local(o)
 	if o == "UIConfignameplateenhance_threat" then o = L_GUI_NAMEPLATE_THREAT end
 	if o == "UIConfignameplateclass_icons" then o = L_GUI_NAMEPLATE_CLASS_ICON end
 	if o == "UIConfignameplatename_abbrev" then o = L_GUI_NAMEPLATE_NAME_ABBREV end
+	if o == "UIConfignameplateclamp" then o = L_GUI_NAMEPLATE_CLAMP end
 	if o == "UIConfignameplategood_color" then o = L_GUI_NAMEPLATE_GOOD_COLOR end
 	if o == "UIConfignameplatenear_color" then o = L_GUI_NAMEPLATE_NEAR_COLOR end
 	if o == "UIConfignameplatebad_color" then o = L_GUI_NAMEPLATE_BAD_COLOR end
+	if o == "UIConfignameplateofftank_color" then o = L_GUI_NAMEPLATE_OFFTANK_COLOR end
 	if o == "UIConfignameplatetrack_auras" then o = L_GUI_NAMEPLATE_SHOW_DEBUFFS end
+	if o == "UIConfignameplatetrack_buffs" then o = L_GUI_NAMEPLATE_SHOW_BUFFS end
 	if o == "UIConfignameplateauras_size" then o = L_GUI_NAMEPLATE_DEBUFFS_SIZE end
 	if o == "UIConfignameplatehealer_icon" then o = L_GUI_NAMEPLATE_HEALER_ICON end
+	if o == "UIConfignameplatetotem_icons" then o = L_GUI_NAMEPLATE_TOTEM_ICONS end
 
 	-- ActionBar options
-	if o == "UIConfigactionbar" then o = ACTIONBAR_LABEL end
+	if o == "UIConfigactionbar" then o = L_GUI_ACTIONBAR end
 	if o == "UIConfigactionbarenable" then o = L_GUI_ACTIONBAR_ENABLE end
 	if o == "UIConfigactionbarhotkey" then o = L_GUI_ACTIONBAR_HOTKEY end
 	if o == "UIConfigactionbarmacro" then o = L_GUI_ACTIONBAR_MACRO end
@@ -333,12 +341,12 @@ local function Local(o)
 	if o == "UIConfigactionbarbottombars" then o = L_GUI_ACTIONBAR_BOTTOMBARS end
 	if o == "UIConfigactionbarrightbars" then o = L_GUI_ACTIONBAR_RIGHTBARS end
 	if o == "UIConfigactionbarrightbars_mouseover" then o = L_GUI_ACTIONBAR_RIGHTBARS_MOUSEOVER end
-	if o == "UIConfigactionbarpetbar_mouseover" then o = L_GUI_ACTIONBAR_PETBAR_MOUSEOVER end
 	if o == "UIConfigactionbarpetbar_hide" then o = L_GUI_ACTIONBAR_PETBAR_HIDE end
 	if o == "UIConfigactionbarpetbar_horizontal" then o = L_GUI_ACTIONBAR_PETBAR_HORIZONTAL end
-	if o == "UIConfigactionbarstancebar_mouseover" then o = L_GUI_ACTIONBAR_STANCEBAR_MOUSEOVER end
+	if o == "UIConfigactionbarpetbar_mouseover" then o = L_GUI_ACTIONBAR_PETBAR_MOUSEOVER end
 	if o == "UIConfigactionbarstancebar_hide" then o = L_GUI_ACTIONBAR_STANCEBAR_HIDE end
 	if o == "UIConfigactionbarstancebar_horizontal" then o = L_GUI_ACTIONBAR_STANCEBAR_HORIZONTAL end
+	if o == "UIConfigactionbarstancebar_mouseover" then o = L_GUI_ACTIONBAR_STANCEBAR_MOUSEOVER end
 	if o == "UIConfigactionbarmicromenu" then o = L_GUI_ACTIONBAR_MICROMENU end
 	if o == "UIConfigactionbarmicromenu_mouseover" then o = L_GUI_ACTIONBAR_MICROMENU_MOUSEOVER end
 
@@ -404,7 +412,7 @@ local function Local(o)
 	if o == "UIConfigunitframeplugins_swing" then o = L_GUI_UF_PLUGINS_SWING end
 	if o == "UIConfigunitframeplugins_reputation_bar" then o = L_GUI_UF_PLUGINS_REPUTATION_BAR end
 	if o == "UIConfigunitframeplugins_experience_bar" then o = L_GUI_UF_PLUGINS_EXPERIENCE_BAR end
-	if o == "UIConfigunitframeplugins_friendship_bar" then o = L_GUI_UF_PLUGINS_FRIENDSHIP_BAR end
+	if o == "UIConfigunitframeplugins_artifact_bar" then o = L_GUI_UF_PLUGINS_ARTIFACT_BAR end
 	if o == "UIConfigunitframeplugins_smooth_bar" then o = L_GUI_UF_PLUGINS_SMOOTH_BAR end
 	if o == "UIConfigunitframeplugins_enemy_spec" then o = L_GUI_UF_PLUGINS_ENEMY_SPEC end
 	if o == "UIConfigunitframeplugins_combat_feedback" then o = L_GUI_UF_PLUGINS_COMBAT_FEEDBACK end
@@ -495,6 +503,9 @@ local NewButton = function(text, parent)
 	local result = CreateFrame("Button", nil, parent, "UIPanelButtonTemplate")
 	local label = result:CreateFontString(nil, "OVERLAY", "GameFontNormal")
 	label:SetText(text)
+	label:SetPoint("LEFT", result, "LEFT", 2, 0)
+	label:SetPoint("RIGHT", result, "RIGHT", -2, 0)
+	label:SetJustifyH("LEFT")
 	result:SetWidth(label:GetWidth())
 	result:SetHeight(label:GetHeight())
 	result:SetFontString(label)
@@ -622,19 +633,19 @@ local function ShowGroup(group, button)
 		local o = "UIConfig"..group
 		Local(o)
 		_G["UIConfigTitle"]:SetText(T.option)
-		local height = _G["UIConfig"..group]:GetHeight()
 		_G["UIConfig"..group]:Show()
-		local scrollamntmax = 400
-		local scrollamntmin = scrollamntmax - 10
-		local max = height > scrollamntmax and height-scrollamntmin or 1
+		local height = _G["UIConfig"..group]:GetHeight()
+		local scrollMax = GlobalHeight
+		local scrollMin = scrollMax - 10
+		local max = height > scrollMax and height - scrollMin or 1
 
 		if max == 1 then
-			_G["UIConfigGroupSlider"]:SetValue(1)
+			_G["UIConfigGroupSlider"]:SetValue(0)
 			_G["UIConfigGroupSlider"]:Hide()
 		else
 			_G["UIConfigGroupSlider"]:SetMinMaxValues(0, max)
-			_G["UIConfigGroupSlider"]:Show()
 			_G["UIConfigGroupSlider"]:SetValue(1)
+			_G["UIConfigGroupSlider"]:Show()
 		end
 		_G["UIConfigGroup"]:SetScrollChild(_G["UIConfig"..group])
 
@@ -676,7 +687,7 @@ function CreateUIConfig()
 	local UIConfigMain = CreateFrame("Frame", "UIConfigMain", UIParent)
 	UIConfigMain:SetPoint("BOTTOM", UIParent, "BOTTOM", 0, 200)
 	UIConfigMain:SetWidth(780)
-	UIConfigMain:SetHeight(520)
+	UIConfigMain:SetHeight(GlobalHeight + 120)
 	if IsAddOnLoaded("Aurora") then
 		local F = unpack(Aurora)
 		F.CreateBD(UIConfigMain)
@@ -685,6 +696,7 @@ function CreateUIConfig()
 	end
 	UIConfigMain:SetFrameStrata("DIALOG")
 	UIConfigMain:SetFrameLevel(20)
+	UIConfigMain:SetClampedToScreen(true)
 	tinsert(UISpecialFrames, "UIConfigMain")
 
 	-- Version Title
@@ -710,7 +722,7 @@ function CreateUIConfig()
 	local UIConfig = CreateFrame("Frame", "UIConfig", UIConfigMain)
 	UIConfig:SetPoint("TOPLEFT", TitleBox, "BOTTOMLEFT", 10, -15)
 	UIConfig:SetWidth(520)
-	UIConfig:SetHeight(400)
+	UIConfig:SetHeight(GlobalHeight)
 
 	local UIConfigBG = CreateFrame("Frame", "UIConfigBG", UIConfig)
 	UIConfigBG:SetPoint("TOPLEFT", -10, 10)
@@ -720,7 +732,7 @@ function CreateUIConfig()
 	local groups = CreateFrame("ScrollFrame", "UIConfigCategoryGroup", UIConfig)
 	groups:SetPoint("TOPLEFT", TitleBoxVer, "BOTTOMLEFT", 10, -15)
 	groups:SetWidth(160)
-	groups:SetHeight(400)
+	groups:SetHeight(GlobalHeight)
 
 	local groupsBG = CreateFrame("Frame", "groupsBG", UIConfig)
 	groupsBG:SetPoint("TOPLEFT", groups, -10, 10)
@@ -738,7 +750,7 @@ function CreateUIConfig()
 	local slider = CreateFrame("Slider", "UIConfigCategorySlider", groups)
 	slider:SetPoint("TOPRIGHT", 0, 0)
 	slider:SetWidth(20)
-	slider:SetHeight(400)
+	slider:SetHeight(GlobalHeight)
 	slider:SetThumbTexture("Interface\\Buttons\\UI-ScrollBar-Knob")
 	slider:SetOrientation("VERTICAL")
 	slider:SetValueStep(20)
@@ -755,7 +767,7 @@ function CreateUIConfig()
 	local function sortMyTable(a, b)
 		return ALLOWED_GROUPS[a] < ALLOWED_GROUPS[b]
 	end
-	local function pairsByKey(t, f)
+	local function pairsByKey(t)
 		local a = {}
 		for n in pairs(t) do table.insert(a, n) end
 		table.sort(a, sortMyTable)
@@ -805,16 +817,28 @@ function CreateUIConfig()
 		local o = "UIConfig"..i
 		Local(o)
 		local button = NewButton(T.option, child)
-		button:SetHeight(16)
-		button:SetWidth(125)
+		button:SetHeight(20)
+		button:SetWidth(150)
 		button:SetPoint("TOPLEFT", 5, -offset)
 		button:SetScript("OnClick", function(self) ShowGroup(i, button) self:SetText("|cff00ff00"..T.option.."|r") end)
 		offset = offset + 20
 	end
-	child:SetWidth(125)
+	child:SetWidth(150)
 	child:SetHeight(offset)
-	slider:SetMinMaxValues(0, (offset == 0 and 1 or offset - 12 * 33))
-	slider:SetValue(1)
+
+	local height = offset
+	local scrollMax = GlobalHeight
+	local scrollMin = scrollMax - 3
+	local max = height > scrollMax and height - scrollMin or 1
+
+	if max == 1 then
+		slider:SetValue(0)
+		slider:Hide()
+	else
+		slider:SetMinMaxValues(0, max)
+		slider:SetValue(1)
+		slider:Show()
+	end
 	groups:SetScrollChild(child)
 
 	local x
@@ -834,13 +858,13 @@ function CreateUIConfig()
 	local group = CreateFrame("ScrollFrame", "UIConfigGroup", UIConfig)
 	group:SetPoint("TOPLEFT", 0, 5)
 	group:SetWidth(520)
-	group:SetHeight(400)
+	group:SetHeight(GlobalHeight)
 
 	-- Options Scroll
 	local slider = CreateFrame("Slider", "UIConfigGroupSlider", group)
 	slider:SetPoint("TOPRIGHT", 0, 0)
 	slider:SetWidth(20)
-	slider:SetHeight(400)
+	slider:SetHeight(GlobalHeight)
 	slider:SetThumbTexture("Interface\\Buttons\\UI-ScrollBar-Knob")
 	slider:SetOrientation("VERTICAL")
 	slider:SetValueStep(20)
@@ -957,8 +981,6 @@ function CreateUIConfig()
 				colortext:SetJustifyH("CENTER")
 				colorbutton:SetWidth(colortext:GetWidth() + 5)
 
-				local oldvalue = value
-
 				local function round(number, decimal)
 					return (("%%.%df"):format(decimal)):format(number)
 				end
@@ -1023,7 +1045,7 @@ function CreateUIConfig()
 
 	local close = NormalButton(CLOSE, UIConfigMain)
 	close:SetPoint("TOPRIGHT", UIConfig, "BOTTOMRIGHT", 10, -25)
-	close:SetScript("OnClick", function(self) PlaySound("igMainMenuOption") UIConfigMain:Hide() end)
+	close:SetScript("OnClick", function(self) PlaySound(SOUNDKIT.IG_MAINMENU_OPTION) UIConfigMain:Hide() end)
 
 	local load = NormalButton(APPLY, UIConfigMain)
 	load:SetPoint("RIGHT", close, "LEFT", -4, 0)
@@ -1079,13 +1101,13 @@ function CreateUIConfig()
 end
 
 do
-	function SlashCmdList.CONFIG(msg, editbox)
+	function SlashCmdList.CONFIG()
 		if not UIConfigMain or not UIConfigMain:IsShown() then
-			PlaySound("igMainMenuOption")
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
 			CreateUIConfig()
 			HideUIPanel(GameMenuFrame)
 		else
-			PlaySound("igMainMenuOption")
+			PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
 			UIConfigMain:Hide()
 		end
 	end
@@ -1131,7 +1153,7 @@ do
 		subtitle2:SetWidth(580)
 		subtitle2:SetPoint("TOPLEFT", title2, "BOTTOMLEFT", 0, -8)
 		subtitle2:SetJustifyH("LEFT")
-		subtitle2:SetText("AcidWeb, Aezay, Affli, Ailae, Allez, ALZA, Ammo, Astromech, Beoko, Bitbyte, Blamdarot, Bozo, Caellian, Califpornia, Camealion, Cloudyfa, Chiril, CrusaderHeimdall, Cybey, Dawn, Don Kaban, Dridzt, Duffed, Durcyn, Eclipse, Egingell, Elv22, Evilpaul, Evl, Favorit, Fernir, Foof, Freebaser, g0st, gi2k15, Gethe, Gorlasch, Gsuz, Haleth, Haste, Hoochie, Hungtar, HyPeRnIcS, Hydra, Ildyria, iSpawnAtHome, Jaslm, Karl_w_w, Karudon, Katae, Kellett, Kemayo, Killakhan, Kraftman, Leatrix, m2jest1c, Magdain, Meurtcriss, Monolit, MrRuben5, Myrilandell of Lothar, Nathanyel, Nefarion, Nightcracker, Nils Ruesch, p3lim, Partha, Phanx, Rahanprout, Renstrom, RustamIrzaev, Safturento, Sara.Festung, SDPhantom, Sildor, Silverwind, SinaC, Slakah, Soeters, Starlon, Suicidal Katt, Syzgyn, Tekkub, Telroth, Thalyra, Thizzelle, Tia Lynn, Tohveli, Tukz, Tuller, Veev, Villiv, Wetxius, Woffle of Dark Iron, Wrug, Xuerian, Yleaf, Zork.")
+		subtitle2:SetText("AcidWeb, Aezay, Affli, Ailae, Allez, ALZA, Ammo, Astromech, Beoko, Bitbyte, Blamdarot, Bozo, Caellian, Califpornia, Camealion, Cloudyfa, Chiril, CrusaderHeimdall, Cybey, Dawn, Don Kaban, Dridzt, Duffed, Durcyn, Eclipse, Egingell, Elv22, Evilpaul, Evl, Favorit, Fernir, Foof, Freebaser, g0st, gi2k15, Gethe, Gorlasch, Gsuz, Haleth, Haste, Hoochie, Hungtar, HyPeRnIcS, Hydra, Ildyria, iSpawnAtHome, Jaslm, Karl_w_w, Karudon, Katae, Kellett, Kemayo, Killakhan, Kraftman, Leatrix, m2jest1c, Magdain, Meurtcriss, Monolit, MrRuben5, Myrilandell of Lothar, Nathanyel, Nefarion, Nightcracker, Nils Ruesch, p3lim, Partha, Phanx, Renstrom, RustamIrzaev, Safturento, Sanex, Sara.Festung, SDPhantom, Sildor, Silverwind, SinaC, Slakah, Soeters, Starlon, Suicidal Katt, Syzgyn, Tekkub, Telroth, Thalyra, Thizzelle, Tia Lynn, Tohveli, Tukz, Tuller, Veev, Villiv, Wetxius, Woffle of Dark Iron, Wrug, Xuerian, Yleaf, Zork.")
 
 		local title3 = self:CreateFontString(nil, "ARTWORK", "GameFontNormalLarge")
 		title3:SetPoint("TOPLEFT", subtitle2, "BOTTOMLEFT", 0, -16)
@@ -1176,7 +1198,7 @@ GameMenuFrame:HookScript("OnShow", function()
 end)
 
 button:SetScript("OnClick", function()
-	PlaySound("igMainMenuOption")
+	PlaySound(SOUNDKIT.IG_MAINMENU_OPTION)
 	HideUIPanel(GameMenuFrame)
 	if not UIConfigMain or not UIConfigMain:IsShown() then
 		CreateUIConfig()

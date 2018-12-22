@@ -9,9 +9,10 @@ local oUF = ns.oUF
 
 local CanDispel = {
 	DRUID = {Magic = false, Curse = true, Poison = true},
+	MAGE = {Curse = true},
 	MONK = {Magic = false, Poison = true, Disease = true},
 	PALADIN = {Magic = false, Poison = true, Disease = true},
-	PRIEST = {Magic = false, Disease = false},
+	PRIEST = {Magic = false, Disease = true},
 	SHAMAN = {Magic = false, Curse = true}
 }
 
@@ -24,7 +25,7 @@ local function GetDebuffType(unit, filter)
 	if not UnitCanAssist("player", unit) then return nil end
 	local i = 1
 	while true do
-		local _, _, texture, _, debufftype = UnitAura(unit, i, "HARMFUL")
+		local _, texture, _, debufftype = UnitAura(unit, i, "HARMFUL")
 		if not texture then break end
 		if debufftype and not filter or (filter and dispellist[debufftype]) then
 			return debufftype, texture
@@ -57,10 +58,8 @@ local function CheckSpec()
 	elseif T.class == "PRIEST" then
 		if spec == 3 then
 			dispellist.Magic = false
-			dispellist.Disease = false
 		else
 			dispellist.Magic = true
-			dispellist.Disease = true
 		end
 	elseif T.class == "SHAMAN" then
 		if spec == 3 then

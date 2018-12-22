@@ -99,7 +99,7 @@ local function Stuffing_OnShow()
 
 	Stuffing:Layout()
 	Stuffing:SearchReset()
-	PlaySound("igBackPackOpen")
+	PlaySound(SOUNDKIT.IG_BACKPACK_OPEN)
 	collectgarbage("collect")
 end
 
@@ -108,14 +108,14 @@ local function StuffingBank_OnHide()
 	if Stuffing.frame:IsShown() then
 		Stuffing.frame:Hide()
 	end
-	PlaySound("igBackPackClose")
+	PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE)
 end
 
 local function Stuffing_OnHide()
 	if Stuffing.bankFrame and Stuffing.bankFrame:IsShown() then
 		Stuffing.bankFrame:Hide()
 	end
-	PlaySound("igBackPackClose")
+	PlaySound(SOUNDKIT.IG_BACKPACK_CLOSE)
 end
 
 local function Stuffing_Open()
@@ -140,77 +140,49 @@ end
 local trashButton = {}
 local trashBag = {}
 
-local upgrades = {
-	["1"] = 8, ["373"] = 4, ["374"] = 8, ["375"] = 4, ["376"] = 4, ["377"] = 4,
-	["379"] = 4, ["380"] = 4, ["446"] = 4, ["447"] = 8, ["452"] = 8, ["454"] = 4,
-	["455"] = 8, ["457"] = 8, ["459"] = 4, ["460"] = 8, ["461"] = 12, ["462"] = 16,
-	["466"] = 4, ["467"] = 8, ["469"] = 4, ["470"] = 8, ["471"] = 12, ["472"] = 16,
-	["477"] = 4, ["478"] = 8, ["480"] = 8, ["492"] = 4, ["493"] = 8, ["495"] = 4,
-	["496"] = 8, ["497"] = 12, ["498"] = 16, ["504"] = 12, ["505"] = 16, ["506"] = 20,
-	["507"] = 24, ["530"] = 5, ["531"] = 10, ["535"] = 15, ["536"] = 30, ["537"] = 45
-}
+-- Tooltip used for scanning
+local scanner = CreateFrame("GameTooltip", "iLvlScanningTooltip", nil, "GameTooltipTemplate")
+local scannerName = scanner:GetName()
 
-local function BOALevel(level, id)
-	if level > 97 then
-		if id == 133585 or id == 133595 or id == 133596 or id == 133597 or id == 133598 then
-			level = 815 - (110 - level) * 10
+-- Tooltip and scanning by Phanx @ http://www.wowinterface.com/forums/showthread.php?p=271406
+local S_ITEM_LEVEL = "^" .. gsub(_G.ITEM_LEVEL, "%%d", "(%%d+)")
+
+local ItemDB = {}
+
+local function _getRealItemLevel(link, owner, bag, slot)
+	if ItemDB[link] then return ItemDB[link] end
+
+	local realItemLevel
+
+	scanner.owner = owner
+	scanner:SetOwner(owner, "ANCHOR_NONE")
+	scanner:SetBagItem(bag, slot)
+
+	local line = _G[scannerName.."TextLeft2"]
+	if line then
+		local msg = line:GetText()
+		if msg and string.find(msg, S_ITEM_LEVEL) then
+			local itemLevel = string.match(msg, S_ITEM_LEVEL)
+			if itemLevel and (tonumber(itemLevel) > 0) then
+				realItemLevel = itemLevel
+			end
 		else
-			level = 605 - (100 - level) * 5
-		end
-	elseif level > 90 then
-		level = 590 - (97 - level) * 10
-	elseif level > 85 then
-		level = 463 - (90 - level) * 19.75
-	elseif level > 80 then
-		level = 333 - (85 - level) * 13.5
-	elseif level > 67 then
-		level = 187 - (80 - level) * 4
-	elseif level > 57 then
-		level = 105 - (67 - level) * 2.88
-	elseif level > 5 then
-		level = level + 5
-	else
-		level = 10
-	end
-
-	return floor(level + 0.5)
-end
-
-local timewarped = {
-	["615"] = 660, -- Dungeon drops
-	["692"] = 675, -- Timewarped badge vendors
-	["656"] = 675, -- Warforged Dungeon drops
-}
-
-local itemLevelPattern = gsub(ITEM_LEVEL, "%%d", "(%%d+)")
-local tooltipLines = {
-	"ShestakUI_ItemScanningTooltipTextLeft2",
-	"ShestakUI_ItemScanningTooltipTextLeft3",
-	"ShestakUI_ItemScanningTooltipTextLeft4"
-}
-local tooltip = CreateFrame("GameTooltip", "ShestakUI_ItemScanningTooltip", UIParent, "GameTooltipTemplate")
-tooltip:SetOwner(UIParent, "ANCHOR_NONE")
-
--- Scan tooltip for item level information
-local function GetItemLevelFromTooltip(itemLink)
-	if not itemLink or not GetItemInfo(itemLink) then
-		return
-	end
-
-	tooltip:ClearLines()
-	tooltip:SetHyperlink(itemLink)
-
-	local text, itemLevel
-	for index = 1, #tooltipLines do
-		text = _G[tooltipLines[index]]:GetText()
-
-		if text then
-			itemLevel = tonumber(string.match(text, itemLevelPattern))
-			if itemLevel then
-				return itemLevel
+			-- Check line 3, some artifacts have the ilevel there
+			line = _G[scannerName.."TextLeft3"]
+			if line then
+				local msg = line:GetText()
+				if msg and string.find(msg, S_ITEM_LEVEL) then
+					local itemLevel = string.match(msg, S_ITEM_LEVEL)
+					if itemLevel and (tonumber(itemLevel) > 0) then
+						realItemLevel = itemLevel
+					end
+				end
 			end
 		end
 	end
+
+	ItemDB[link] = tonumber(realItemLevel)
+	return realItemLevel
 end
 
 function Stuffing:SlotUpdate(b)
@@ -223,50 +195,38 @@ function Stuffing:SlotUpdate(b)
 		b.frame:SetBackdropBorderColor(unpack(C.media.border_color))
 	end
 
-	if C.bag.ilvl == true then
-		b.frame.text:SetText("")
-	end
-
 	if b.cooldown and StuffingFrameBags and StuffingFrameBags:IsShown() then
 		local start, duration, enable = GetContainerItemCooldown(b.bag, b.slot)
 		CooldownFrame_Set(b.cooldown, start, duration, enable)
 	end
 
+	if C.bag.ilvl == true then
+		b.frame.text:SetText("")
+	end
+
+	b.frame.Azerite:Hide()
+
+	if b.frame.UpgradeIcon then
+		b.frame.UpgradeIcon:SetPoint("TOPLEFT", C.bag.button_size/2.7, -C.bag.button_size/2.7)
+		b.frame.UpgradeIcon:SetSize(C.bag.button_size/1.7, C.bag.button_size/1.7)
+		local itemIsUpgrade = IsContainerItemAnUpgrade(b.frame:GetParent():GetID(), b.frame:GetID())
+		if itemIsUpgrade and itemIsUpgrade == true then
+			b.frame.UpgradeIcon:SetShown(true)
+		else
+			b.frame.UpgradeIcon:SetShown(false)
+		end
+	end
+
 	if clink then
-		b.name, _, _, b.itemlevel, b.level, _, _, _, _, _, _, b.itemClassID = GetItemInfo(clink)
+		b.name, _, _, b.itemlevel, b.level, _, _, _, _, _, _, b.itemClassID, b.itemSubClassID = GetItemInfo(clink)
 
-		if C.bag.ilvl == true and b.itemlevel and quality > 1 and (b.itemClassID == 2 or b.itemClassID == 4) then
-			if quality == 7 and b.itemlevel == 1 then
-				local id = tonumber(strmatch(clink, "item:(%d+)"))
-				b.frame.text:SetText(BOALevel(T.level, id))
-			elseif b.itemlevel > 1 then
-				local tid = strmatch(clink, ".+:512:22.+:(%d+):100")
-				if timewarped[tid] then
-					b.itemlevel = timewarped[tid]
-				end
+		if C.bag.ilvl == true and b.itemlevel and quality > 1 and (b.itemClassID == 2 or b.itemClassID == 4 or (b.itemClassID == 3 and b.itemSubClassID == 11)) then
+			b.itemlevel = _getRealItemLevel(clink, self, b.bag, b.slot) or b.itemlevel
+			b.frame.text:SetText(b.itemlevel)
+		end
 
-				local upgradeTypeID = select(12, strsplit(":", clink))
-				if upgradeTypeID and upgradeTypeID ~= "" then
-					local uid = clink:match("[-:%d]+:([-%d]+)")
-					if upgrades[uid] then
-						b.itemlevel = b.itemlevel + upgrades[uid]
-					end
-				end
-
-				local numBonusIDs = tonumber(strmatch(clink, ".+:%d+:512:%d*:(%d+).+"))
-				if numBonusIDs then
-					if GetDetailedItemLevelInfo then
-						local effectiveLevel, previewLevel, origLevel = GetDetailedItemLevelInfo(clink)
-						b.itemlevel = effectiveLevel or b.itemlevel
-					end
-				end
-
-				if quality == 6 then
-					b.itemlevel = GetItemLevelFromTooltip(clink) or b.itemlevel
-				end
-
-				b.frame.text:SetText(b.itemlevel)
-			end
+		if b.frame.Azerite and C_AzeriteEmpoweredItem.IsAzeriteEmpoweredItemByID(clink) then
+			b.frame.Azerite:Show()
 		end
 
 		if (IsItemUnusable(clink) or b.level and b.level > T.level) and not locked then
@@ -301,6 +261,13 @@ function Stuffing:BagSlotUpdate(bag)
 		if v.bag == bag then
 			self:SlotUpdate(v)
 		end
+	end
+end
+
+function Stuffing:UpdateCooldowns(b)
+	if b.cooldown and StuffingFrameBags and StuffingFrameBags:IsShown() then
+		local start, duration, enable = GetContainerItemCooldown(b.bag, b.slot)
+		CooldownFrame_Set(b.cooldown, start, duration, enable)
 	end
 end
 
@@ -340,7 +307,7 @@ function CreateReagentContainer()
 		_G["StuffingFrameBank"]:Show()
 		_G["StuffingFrameBank"]:SetAlpha(1)
 		BankFrame_ShowPanel(BANK_PANELS[1].name)
-		PlaySound("igBackPackOpen")
+		PlaySound(SOUNDKIT.IG_BACKPACK_OPEN)
 	end)
 
 	Deposit:SetParent(Reagent)
@@ -461,6 +428,17 @@ function Stuffing:BagFrameSlotNew(p, slot)
 		ret.frame = CreateFrame("CheckButton", "StuffingBBag"..slot.."Slot", p, "BankItemButtonBagTemplate")
 		ret.frame:StripTextures()
 		ret.frame:SetID(slot)
+		hooksecurefunc(ret.frame.IconBorder, "SetVertexColor", function(self, r, g, b)
+			if r ~= 0.65882 and g ~= 0.65882 and b ~= 0.65882 then
+				self:GetParent():SetBackdropBorderColor(r, g, b)
+			end
+			self:SetTexture("")
+		end)
+
+		hooksecurefunc(ret.frame.IconBorder, "Hide", function(self)
+			self:GetParent():SetBackdropBorderColor(unpack(C.media.border_color))
+		end)
+
 		table.insert(self.bagframe_buttons, ret)
 
 		BankFrameItemButton_Update(ret.frame)
@@ -487,10 +465,10 @@ function Stuffing:BagFrameSlotNew(p, slot)
 		table.insert(self.bagframe_buttons, ret)
 	end
 
-	ret.frame:SetTemplate("Default")
 	ret.frame:StyleButton()
-	ret.frame:SetNormalTexture("")
-	ret.frame:SetCheckedTexture("")
+	ret.frame:SetTemplate("Default")
+	ret.frame:SetNormalTexture(nil)
+	ret.frame:SetCheckedTexture(nil)
 
 	ret.icon = _G[ret.frame:GetName().."IconTexture"]
 	ret.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
@@ -560,6 +538,13 @@ function Stuffing:SlotNew(bag, slot)
 			ret.frame.text:SetPoint("TOPLEFT", 1, -1)
 			ret.frame.text:SetTextColor(1, 1, 0)
 		end
+
+		ret.frame.Azerite = ret.frame:CreateTexture(nil, "OVERLAY")
+		ret.frame.Azerite:SetAtlas("AzeriteIconFrame")
+		ret.frame.Azerite:SetTexCoord(0, 1, 0, 1)
+		ret.frame.Azerite:SetPoint("TOPLEFT", ret.frame, 1, -1)
+		ret.frame.Azerite:SetPoint("BOTTOMRIGHT", ret.frame, -1, 1)
+		ret.frame.Azerite:Hide()
 
 		local Battlepay = _G[ret.frame:GetName()].BattlepayItemTexture
 		if Battlepay then
@@ -718,7 +703,7 @@ function Stuffing:CreateBagFrame(w)
 		f.b_reagent:SkinButton()
 		f.b_reagent:SetScript("OnClick", function()
 			BankFrame_ShowPanel(BANK_PANELS[2].name)
-			PlaySound("igBackPackOpen")
+			PlaySound(SOUNDKIT.IG_BACKPACK_OPEN)
 			if not ReagentBankFrame.isMade then
 				CreateReagentContainer()
 				ReagentBankFrame.isMade = true
@@ -738,7 +723,7 @@ function Stuffing:CreateBagFrame(w)
 		f.b_purchase:SetPoint("TOPLEFT", f.b_reagent, "TOPRIGHT", 3, 0)
 		f.b_purchase:RegisterForClicks("AnyUp")
 		f.b_purchase:SkinButton()
-		f.b_purchase:SetScript("OnClick", function(self) StaticPopup_Show("CONFIRM_BUY_BANK_SLOT") end)
+		f.b_purchase:SetScript("OnClick", function(self) StaticPopup_Show("BUY_BANK_SLOT") end)
 		f.b_purchase:FontString("text", C.font.bags_font, C.font.bags_font_size, C.font.bags_font_style)
 		f.b_purchase.text:SetPoint("CENTER")
 		f.b_purchase.text:SetText(BANKSLOTPURCHASE)
@@ -852,6 +837,7 @@ function Stuffing:InitBags()
 	button:EnableMouse(true)
 	button:RegisterForClicks("LeftButtonUp", "RightButtonUp")
 	button:SetAllPoints(detail)
+	button.ttText = L_BAG_RIGHT_CLICK_SEARCH
 	button:SetScript("OnClick", function(self, btn)
 		if btn == "RightButton" then
 			self:GetParent().detail:Hide()
@@ -874,7 +860,7 @@ function Stuffing:InitBags()
 	local tooltip_show = function(self)
 		GameTooltip:SetOwner(self, "ANCHOR_TOPLEFT", -12, 11)
 		GameTooltip:ClearLines()
-		GameTooltip:SetText(L_BAG_RIGHT_CLICK_SEARCH)
+		GameTooltip:SetText(self.ttText)
 	end
 
 	button:SetScript("OnEnter", tooltip_show)
@@ -1126,7 +1112,7 @@ function Stuffing:ADDON_LOADED(addon)
 	CloseAllBags = Stuffing_Close
 	CloseBackpack = Stuffing_Close
 
-	--BankFrame:UnregisterAllEvents()
+	BankFrame:UnregisterAllEvents()
 	BankFrame:SetScale(0.00001)
 	BankFrame:SetAlpha(0)
 	BankFrame:SetPoint("TOPLEFT")
@@ -1251,7 +1237,7 @@ end
 
 function Stuffing:BAG_UPDATE_COOLDOWN()
 	for i, v in pairs(self.buttons) do
-		self:SlotUpdate(v)
+		self:UpdateCooldowns(v)
 	end
 end
 
@@ -1356,9 +1342,10 @@ function Stuffing:SortBags()
 					local newItem = {}
 
 					local n, _, q, iL, rL, c1, c2, _, Sl = GetItemInfo(itemLink)
-					if n == GetItemInfo(6948) then c1 = "1" end	-- Hearthstone
-					if n == GetItemInfo(110560) then c1 = "12" end	-- Garrison Hearthstone
-					if n == GetItemInfo(64488) then c1 = "1" end	-- The Innkeeper's Daughter
+					-- Hearthstone
+					if n == GetItemInfo(6948) or n == GetItemInfo(110560) then
+						q = 9
+					end
 					-- Fix for battle pets
 					if not n then
 						n = itemLink
@@ -1548,7 +1535,21 @@ function Stuffing.Menu(self, level)
 	UIDropDownMenu_AddButton(info, level)
 end
 
+StaticPopupDialogs.BUY_BANK_SLOT = {
+	text = CONFIRM_BUY_BANK_SLOT,
+	button1 = YES,
+	button2 = NO,
+	OnAccept = PurchaseSlot,
+	OnShow = function(self)
+		MoneyFrame_Update(self.moneyFrame, GetBankSlotCost())
+	end,
+	hasMoneyFrame = 1,
+	timeout = 0,
+	hideOnEscape = 1,
+}
+
 -- Kill Blizzard functions
 LootWonAlertFrame_OnClick = T.dummy
 LootUpgradeFrame_OnClick = T.dummy
 StorePurchaseAlertFrame_OnClick = T.dummy
+LegendaryItemAlertFrame_OnClick = T.dummy

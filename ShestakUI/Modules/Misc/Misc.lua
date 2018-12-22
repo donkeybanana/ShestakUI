@@ -5,7 +5,7 @@
 ----------------------------------------------------------------------------------------
 local ShowReadyCheckHook = function(self, initiator)
 	if initiator ~= "player" then
-		PlaySound("ReadyCheck", "Master")
+		PlaySound(SOUNDKIT.READY_CHECK, "Master")
 	end
 end
 hooksecurefunc("ShowReadyCheck", ShowReadyCheckHook)
@@ -15,7 +15,6 @@ hooksecurefunc("ShowReadyCheck", ShowReadyCheckHook)
 ----------------------------------------------------------------------------------------
 local ForceWarning = CreateFrame("Frame")
 ForceWarning:RegisterEvent("UPDATE_BATTLEFIELD_STATUS")
-ForceWarning:RegisterEvent("BATTLEFIELD_MGR_ENTRY_INVITE")
 ForceWarning:RegisterEvent("PET_BATTLE_QUEUE_PROPOSE_MATCH")
 ForceWarning:RegisterEvent("LFG_PROPOSAL_SHOW")
 ForceWarning:RegisterEvent("RESURRECT_REQUEST")
@@ -24,17 +23,15 @@ ForceWarning:SetScript("OnEvent", function(self, event)
 		for i = 1, GetMaxBattlefieldID() do
 			local status = GetBattlefieldStatus(i)
 			if status == "confirm" then
-				PlaySound("PVPTHROUGHQUEUE", "Master")
+				PlaySound(SOUNDKIT.PVP_THROUGH_QUEUE, "Master")
 				break
 			end
 			i = i + 1
 		end
-	elseif event == "BATTLEFIELD_MGR_ENTRY_INVITE" then
-		PlaySound("PVPTHROUGHQUEUE", "Master")
 	elseif event == "PET_BATTLE_QUEUE_PROPOSE_MATCH" then
-		PlaySound("PVPTHROUGHQUEUE", "Master")
+		PlaySound(SOUNDKIT.PVP_THROUGH_QUEUE, "Master")
 	elseif event == "LFG_PROPOSAL_SHOW" then
-		PlaySound("ReadyCheck", "Master")
+		PlaySound(SOUNDKIT.READY_CHECK, "Master")
 	elseif event == "RESURRECT_REQUEST" then
 		PlaySoundFile("Sound\\Spells\\Resurrection.wav", "Master")
 	end
@@ -46,7 +43,6 @@ end)
 StaticPopupDialogs.RESURRECT.hideOnEscape = nil
 StaticPopupDialogs.AREA_SPIRIT_HEAL.hideOnEscape = nil
 StaticPopupDialogs.PARTY_INVITE.hideOnEscape = nil
-StaticPopupDialogs.PARTY_INVITE_XREALM.hideOnEscape = nil
 StaticPopupDialogs.CONFIRM_SUMMON.hideOnEscape = nil
 StaticPopupDialogs.ADDON_ACTION_FORBIDDEN.button1 = nil
 StaticPopupDialogs.TOO_MANY_LUA_ERRORS.button1 = nil
@@ -59,38 +55,35 @@ PVPReadyDialog.enterButton:SetPoint("BOTTOM", PVPReadyDialog, "BOTTOM", 0, 25)
 --	Spin camera while afk(by Telroth and Eclipse)
 ----------------------------------------------------------------------------------------
 if C.misc.afk_spin_camera == true then
-	local SpinCam = CreateFrame("Frame")
-
-	local OnEvent = function(self, event, unit)
-		if event == "PLAYER_FLAGS_CHANGED" then
-			if unit == "player" then
-				if UnitIsAFK(unit) then
-					SpinStart()
-				else
-					SpinStop()
-				end
-			end
-		elseif event == "PLAYER_LEAVING_WORLD" then
-			SpinStop()
-		end
-	end
-	SpinCam:RegisterEvent("PLAYER_ENTERING_WORLD")
-	SpinCam:RegisterEvent("PLAYER_LEAVING_WORLD")
-	SpinCam:RegisterEvent("PLAYER_FLAGS_CHANGED")
-	SpinCam:SetScript("OnEvent", OnEvent)
-
-	function SpinStart()
+	local spinning
+	local function SpinStart()
 		spinning = true
 		MoveViewRightStart(0.1)
 		UIParent:Hide()
 	end
 
-	function SpinStop()
+	local function SpinStop()
 		if not spinning then return end
 		spinning = nil
 		MoveViewRightStop()
+		if InCombatLockdown() then return end
 		UIParent:Show()
 	end
+
+	local SpinCam = CreateFrame("Frame")
+	SpinCam:RegisterEvent("PLAYER_LEAVING_WORLD")
+	SpinCam:RegisterEvent("PLAYER_FLAGS_CHANGED")
+	SpinCam:SetScript("OnEvent", function(self, event, unit)
+		if event == "PLAYER_LEAVING_WORLD" then
+			SpinStop()
+		else
+			if UnitIsAFK("player") and not InCombatLockdown() then
+				SpinStart()
+			else
+				SpinStop()
+			end
+		end
+	end)
 end
 
 ----------------------------------------------------------------------------------------
@@ -103,9 +96,8 @@ if C.general.custom_lagtolerance == true then
 	local LatencyUpdate = function(self, elapsed)
 		int = int - elapsed
 		if int < 0 then
-			if GetCVar("reducedLagTolerance") ~= tostring(1) then SetCVar("reducedLagTolerance", tostring(1)) end
 			if lag ~= 0 and lag <= 400 then
-				SetCVar("maxSpellStartRecoveryOffset", tostring(lag))
+				SetCVar("SpellQueueWindow", tostring(lag))
 			end
 			int = 5
 		end
@@ -168,7 +160,7 @@ strip:SetScript("OnClick", function(self, button)
 	else
 		self.model:Undress()
 	end
-	PlaySound("gsTitleOptionOK")
+	PlaySound(SOUNDKIT.GS_TITLE_OPTION_OK)
 end)
 strip.model = DressUpModel
 
@@ -245,8 +237,24 @@ end)
 ----------------------------------------------------------------------------------------
 --	Boss Banner Hider
 ----------------------------------------------------------------------------------------
-if C.automation.banner_hide == true then
+if C.misc.hide_banner == true then
 	BossBanner.PlayBanner = function() end
+end
+
+----------------------------------------------------------------------------------------
+--	Hide TalkingHeadFrame
+----------------------------------------------------------------------------------------
+if C.misc.hide_talking_head == true then
+	local frame = CreateFrame("Frame")
+	frame:RegisterEvent("ADDON_LOADED")
+	frame:SetScript("OnEvent", function(self, event, addon)
+		if addon == "Blizzard_TalkingHeadUI" then
+			hooksecurefunc("TalkingHeadFrame_PlayCurrent", function()
+				TalkingHeadFrame:Hide()
+			end)
+			self:UnregisterEvent(event)
+		end
+	end)
 end
 
 ----------------------------------------------------------------------------------------

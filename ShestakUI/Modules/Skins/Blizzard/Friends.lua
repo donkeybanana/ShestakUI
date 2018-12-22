@@ -14,24 +14,14 @@ local function LoadSkin()
 		"WhoFrameColumnHeader2",
 		"WhoFrameColumnHeader3",
 		"WhoFrameColumnHeader4",
-		"ChannelListScrollFrame",
-		"ChannelRoster",
-		"FriendsFramePendingButton1",
-		"FriendsFramePendingButton2",
-		"FriendsFramePendingButton3",
-		"FriendsFramePendingButton4",
-		"ChannelFrameDaughterFrame",
 		"AddFriendFrame",
 		"AddFriendNoteFrame",
 		"FriendsFriendsFrame",
 		"FriendsFriendsList",
 		"IgnoreListFrame",
-		"PendingListFrame",
 		"FriendsFrameInset",
 		"WhoFrameListInset",
 		"WhoFrameEditBoxInset",
-		"ChannelFrameRightInset",
-		"ChannelFrameLeftInset",
 		"LFRQueueFrameListInset",
 		"LFRQueueFrameRoleInset",
 		"LFRQueueFrameCommentInset",
@@ -41,9 +31,9 @@ local function LoadSkin()
 		"ScrollOfResurrectionFrameNoteFrame",
 		"FriendsFrameBattlenetFrame",
 		"BattleTagInviteFrame",
-		"BNetReportFrame",
-		"BNetReportFrameComment",
-		"RecruitAFriendNoteFrame"
+		"RecruitAFriendNoteFrame",
+		"QuickJoinScrollFrame",
+		"QuickJoinRoleSelectionFrame"
 	}
 
 	for _, object in pairs(StripAllTextures) do
@@ -67,20 +57,8 @@ local function LoadSkin()
 		"WhoFrameWhoButton",
 		"WhoFrameAddFriendButton",
 		"WhoFrameGroupInviteButton",
-		"ChannelFrameNewButton",
 		"FriendsFrameIgnorePlayerButton",
-		"FriendsFrameMutePlayerButton",
 		"FriendsFrameUnsquelchButton",
-		"FriendsFramePendingButton1AcceptButton",
-		"FriendsFramePendingButton1DeclineButton",
-		"FriendsFramePendingButton2AcceptButton",
-		"FriendsFramePendingButton2DeclineButton",
-		"FriendsFramePendingButton3AcceptButton",
-		"FriendsFramePendingButton3DeclineButton",
-		"FriendsFramePendingButton4AcceptButton",
-		"FriendsFramePendingButton4DeclineButton",
-		"ChannelFrameDaughterFrameOkayButton",
-		"ChannelFrameDaughterFrameCancelButton",
 		"AddFriendEntryFrameAcceptButton",
 		"AddFriendEntryFrameCancelButton",
 		"AddFriendInfoFrameContinueButton",
@@ -90,9 +68,6 @@ local function LoadSkin()
 		"ScrollOfResurrectionSelectionFrameCancelButton",
 		"ScrollOfResurrectionFrameAcceptButton",
 		"ScrollOfResurrectionFrameCancelButton",
-		"PendingListInfoFrameContinueButton",
-		"BNetReportFrameReportButton",
-		"BNetReportFrameCancelButton",
 		"RecruitAFriendFrameSendButton"
 	}
 
@@ -105,7 +80,7 @@ local function LoadSkin()
 		"FriendsFrameIgnoreScrollFrameScrollBar",
 		"FriendsFriendsScrollFrameScrollBar",
 		"WhoListScrollFrameScrollBar",
-		"ChannelRosterScrollFrameScrollBar"
+		"QuickJoinScrollFrameScrollBar"
 	}
 
 	for _, scrollbar in pairs(scrollbars) do
@@ -116,13 +91,10 @@ local function LoadSkin()
 	WhoFrameWhoButton:SetPoint("RIGHT", WhoFrameAddFriendButton, "LEFT", -3, 0)
 	WhoFrameAddFriendButton:SetPoint("RIGHT", WhoFrameGroupInviteButton, "LEFT", -3, 0)
 	WhoFrameGroupInviteButton:SetPoint("BOTTOMRIGHT", WhoFrame, "BOTTOMRIGHT", -4, 4)
-	ChannelFrameDaughterFrameCancelButton:SetPoint("LEFT", ChannelFrameDaughterFrameOkayButton, "RIGHT", 3, 0)
 	FriendsFrameAddFriendButton:SetPoint("BOTTOMLEFT", FriendsFrame, "BOTTOMLEFT", 4, 4)
 	FriendsFrameSendMessageButton:SetPoint("BOTTOMRIGHT", FriendsFrame, "BOTTOMRIGHT", -4, 4)
 	FriendsFrameIgnorePlayerButton:SetPoint("BOTTOMLEFT", FriendsFrame, "BOTTOMLEFT", 4, 4)
 	FriendsFrameUnsquelchButton:SetPoint("BOTTOMRIGHT", FriendsFrame, "BOTTOMRIGHT", -4, 4)
-	FriendsFrameMutePlayerButton:SetPoint("LEFT", FriendsFrameIgnorePlayerButton, "RIGHT", 3, 0)
-	FriendsFrameMutePlayerButton:SetPoint("RIGHT", FriendsFrameUnsquelchButton, "LEFT", -3, 0)
 
 	-- Resize Buttons
 	WhoFrameWhoButton:SetSize(WhoFrameWhoButton:GetWidth() + 7, WhoFrameWhoButton:GetHeight())
@@ -136,7 +108,32 @@ local function LoadSkin()
 	AddFriendFrame:SetTemplate("Transparent")
 	FriendsFriendsFrame:SetTemplate("Transparent")
 	FriendsFriendsList:SetTemplate("Overlay")
-	PendingListInfoFrame:SetTemplate("Overlay")
+
+	-- Quick Join Frame
+	QuickJoinFrame.JoinQueueButton:SkinButton()
+	QuickJoinRoleSelectionFrame:SetTemplate("Transparent")
+	QuickJoinRoleSelectionFrame.AcceptButton:SkinButton()
+	QuickJoinRoleSelectionFrame.CancelButton:SkinButton()
+	T.SkinCloseButton(QuickJoinRoleSelectionFrame.CloseButton)
+	T.SkinCheckBox(QuickJoinRoleSelectionFrame.RoleButtonTank.CheckButton)
+	T.SkinCheckBox(QuickJoinRoleSelectionFrame.RoleButtonHealer.CheckButton)
+	T.SkinCheckBox(QuickJoinRoleSelectionFrame.RoleButtonDPS.CheckButton)
+
+	-- Pending invites
+	FriendsFrameFriendsScrollFrame.PendingInvitesHeaderButton:SkinButton()
+	local function SkinFriendRequest(frame)
+		if not frame.isSkinned then
+			frame.DeclineButton:SetPoint("RIGHT", frame, "RIGHT", -2, 1)
+			frame.DeclineButton:SkinButton()
+			frame.AcceptButton:SkinButton()
+			frame.isSkinned = true
+		end
+	end
+	hooksecurefunc(FriendsFrameFriendsScrollFrame.invitePool, "Acquire", function()
+		for object in pairs(FriendsFrameFriendsScrollFrame.invitePool.activeObjects) do
+			SkinFriendRequest(object)
+		end
+	end)
 
 	-- Who Frame
 	local function UpdateWhoSkins()
@@ -149,25 +146,10 @@ local function LoadSkin()
 	WhoListScrollFrame:ClearAllPoints()
 	WhoListScrollFrame:SetPoint("TOPRIGHT", WhoFrameListInset, -25, 0)
 
-	-- Channel Frame
-	local function UpdateChannel()
-		ChannelRosterScrollFrame:StripTextures()
-	end
-
-	ChannelFrame:HookScript("OnShow", UpdateChannel)
-	hooksecurefunc("FriendsFrame_OnEvent", UpdateChannel)
-
 	-- BNet Frame
 	FriendsFrameBroadcastInput:CreateBackdrop("Overlay")
 	FriendsFrameBroadcastInput.backdrop:SetPoint("TOPLEFT", -2, 2)
 	FriendsFrameBroadcastInput.backdrop:SetPoint("BOTTOMRIGHT", 0, 1)
-
-	ChannelFrameDaughterFrame:SetTemplate("Transparent")
-	T.SkinEditBox(ChannelFrameDaughterFrameChannelName)
-	T.SkinEditBox(ChannelFrameDaughterFrameChannelPassword)
-
-	BNetReportFrame:SetTemplate("Transparent")
-	BNetReportFrameComment:SetTemplate("Overlay")
 
 	FriendsFrameBattlenetFrame.BroadcastButton:SetAlpha(0)
 	FriendsFrameBattlenetFrame.BroadcastButton:ClearAllPoints()
@@ -179,7 +161,9 @@ local function LoadSkin()
 	FriendsFrameBattlenetFrame.BroadcastFrame.backdrop:SetPoint("BOTTOMRIGHT", 1, 1)
 
 	FriendsFrameBattlenetFrame.BroadcastFrame.ScrollFrame:StripTextures()
-	FriendsFrameBattlenetFrame.BroadcastFrame.ScrollFrame:SetTemplate("Overlay")
+	FriendsFrameBattlenetFrame.BroadcastFrame.ScrollFrame:CreateBackdrop("Overlay")
+	FriendsFrameBattlenetFrame.BroadcastFrame.ScrollFrame.backdrop:SetPoint("TOPLEFT", -2, 4)
+	FriendsFrameBattlenetFrame.BroadcastFrame.ScrollFrame.backdrop:SetPoint("BOTTOMRIGHT", 2, 0)
 	FriendsFrameBattlenetFrame.BroadcastFrame.ScrollFrame.CancelButton:SkinButton()
 	FriendsFrameBattlenetFrame.BroadcastFrame.ScrollFrame.UpdateButton:SkinButton()
 
@@ -225,20 +209,24 @@ local function LoadSkin()
 
 	FriendsTabHeaderRecruitAFriendButton:SetTemplate("Default")
 	FriendsTabHeaderRecruitAFriendButton:StyleButton()
+	FriendsTabHeaderRecruitAFriendButton:SetSize(23, 23)
+	FriendsTabHeaderRecruitAFriendButton:ClearAllPoints()
+	FriendsTabHeaderRecruitAFriendButton:SetPoint("TOPRIGHT", FriendsFrame, -9, -58)
 	FriendsTabHeaderRecruitAFriendButtonIcon:SetDrawLayer("OVERLAY")
 	FriendsTabHeaderRecruitAFriendButtonIcon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 	FriendsTabHeaderRecruitAFriendButtonIcon:ClearAllPoints()
 	FriendsTabHeaderRecruitAFriendButtonIcon:SetPoint("TOPLEFT", 2, -2)
 	FriendsTabHeaderRecruitAFriendButtonIcon:SetPoint("BOTTOMRIGHT", -2, 2)
 
-	T.SkinCloseButton(ChannelFrameDaughterFrameDetailCloseButton, ChannelFrameDaughterFrame)
 	T.SkinCloseButton(FriendsFrameCloseButton)
 	T.SkinDropDownBox(WhoFrameDropDown, 150)
 	T.SkinDropDownBox(FriendsFrameStatusDropDown, 70)
 	T.SkinDropDownBox(FriendsFriendsFrameDropDown)
 
-	T.SkinCheckBox(ChannelFrameAutoJoinBattleground)
-	T.SkinCheckBox(ChannelFrameAutoJoinParty)
+	T.SkinCloseButton(FriendsTabHeader.FriendsFrameQuickJoinHelpTip.CloseButton)
+	FriendsTabHeader.FriendsFrameQuickJoinHelpTip.Arrow:Hide()
+	FriendsTabHeader.FriendsFrameQuickJoinHelpTip:StripTextures()
+	FriendsTabHeader.FriendsFrameQuickJoinHelpTip:CreateBackdrop("Transparent")
 
 	-- Bottom Tabs
 	for i = 1, 5 do
@@ -248,26 +236,6 @@ local function LoadSkin()
 	for i = 1, 3 do
 		T.SkinTab(_G["FriendsTabHeaderTab"..i], true)
 	end
-
-	local once = false
-	local function Channel()
-		for i = 1, MAX_DISPLAY_CHANNEL_BUTTONS do
-			local button = _G["ChannelButton"..i]
-
-			if button then
-				if i > 1 then
-					button:SetPoint("TOPLEFT", _G["ChannelButton"..i-1], "BOTTOMLEFT", 0, -3)
-				end
-				if i == 2 and once == false then
-					button:SkinButton()
-					once = true
-				elseif i ~= 2 then
-					button:SkinButton()
-				end
-			end
-		end
-	end
-	hooksecurefunc("ChannelList_Update", Channel)
 end
 
 tinsert(T.SkinFuncs["ShestakUI"], LoadSkin)

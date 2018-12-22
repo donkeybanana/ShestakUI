@@ -6,10 +6,10 @@ if C.misc.already_known ~= true then return end
 ----------------------------------------------------------------------------------------
 local color = {r = 0.1, g = 1, b = 0.1}
 local knowns, lines = {}, {}
-local glyph = AUCTION_CATEGORY_GLYPHS
-local recipe = AUCTION_CATEGORY_RECIPES
-local pet = GetItemSubClassInfo(LE_ITEM_CLASS_MISCELLANEOUS, 2)
-local mount = GetItemSubClassInfo(LE_ITEM_CLASS_MISCELLANEOUS, 5)
+local glyph = LE_ITEM_CLASS_GLYPH
+local recipe = LE_ITEM_CLASS_RECIPE
+local pet = LE_ITEM_MISCELLANEOUS_COMPANION_PET
+local mount = LE_ITEM_MISCELLANEOUS_MOUNT
 local knowables = {[glyph] = true, [recipe] = true, [pet] = true, [mount] = true}
 
 local pattern = ITEM_PET_KNOWN:gsub("%(", "%%(")
@@ -44,14 +44,14 @@ local function IsKnown(itemLink)
 
 	if PlayerHasToy(itemID) then return true end
 
-	local _, _, _, _, _, itemType, itemSubType = GetItemInfo(itemID)
-	if not (knowables[itemType] or knowables[itemSubType]) then return end
+	local _, _, _, _, _, _, _, _, _, _, _, class, subClass = GetItemInfo(itemID)
+	if not (knowables[class] or knowables[subClass]) then return end
 
 	tooltip:ClearLines()
 	tooltip:SetHyperlink(itemLink)
 	if not Scan(2, tooltip:NumLines()) then return end
 
-	if itemSubType ~= pet then knowns[itemID] = true end
+	if subClass ~= pet then knowns[itemID] = true end
 	return true
 end
 
@@ -81,7 +81,7 @@ local function LootFrame_UpdateButton(index)
 	if button and button:IsShown() then
 		local slot = (numLootToShow * (LootFrame.page - 1)) + index
 		if slot <= numLootItems and LootSlotHasItem(slot) and index <= numLootToShow then
-			local texture, _, _, _, locked = GetLootSlotInfo(slot)
+			local texture, _, _, _, _, locked = GetLootSlotInfo(slot)
 			if texture and not locked and IsKnown(GetLootSlotLink(slot)) then
 				SetItemButtonTextureVertexColor(button, color.r, color.g, color.b)
 			end
@@ -319,13 +319,13 @@ local function BlackMarketScrollFrame_Update()
 
 	for i = 1, #buttons do
 		local index = offset + i
-		if index > numItems then return end
-
-		local texture = buttons[i].Item.IconTexture
-		if texture and texture:IsShown() then
-			local name, _, _, _, usable, _, _, _, _, _, _, _, _, _, link = C_BlackMarket.GetItemInfoByIndex(index)
-			if name and usable and IsKnown(link) then
-				texture:SetVertexColor(color.r, color.g, color.b)
+		if type(numItems) == "number" and index <= numItems then
+			local texture = buttons[i].Item.IconTexture
+			if texture and texture:IsShown() then
+				local name, _, _, _, usable, _, _, _, _, _, _, _, _, _, link = C_BlackMarket.GetItemInfoByIndex(index)
+				if name and usable and IsKnown(link) then
+					texture:SetVertexColor(color.r, color.g, color.b)
+				end
 			end
 		end
 	end

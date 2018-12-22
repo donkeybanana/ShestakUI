@@ -21,7 +21,6 @@ frame:SetScript("OnEvent", function(self, event, addon)
 		end
 		ShowPartyFrame = T.dummy
 		HidePartyFrame = T.dummy
-		--BETA CompactUnitFrame_UpdateAll = T.dummy -- Conflict with nameplates
 		CompactUnitFrameProfiles_ApplyProfile = T.dummy
 		CompactRaidFrameManager_UpdateShown = T.dummy
 		CompactRaidFrameManager_UpdateOptionsFlowContainer = T.dummy
@@ -62,6 +61,7 @@ frame:SetScript("OnEvent", function(self, event, addon)
 		InterfaceOptionsActionBarsPanelRight:Kill()
 		InterfaceOptionsActionBarsPanelRightTwo:Kill()
 		InterfaceOptionsActionBarsPanelAlwaysShowActionBars:Kill()
+		InterfaceOptionsActionBarsPanelStackRightBars:Kill()
 	end
 
 	if C.nameplate.enable then

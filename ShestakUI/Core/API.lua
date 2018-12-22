@@ -4,6 +4,35 @@ local backdropr, backdropg, backdropb, backdropa = unpack(C.media.backdrop_color
 local borderr, borderg, borderb, bordera = unpack(C.media.border_color)
 
 ----------------------------------------------------------------------------------------
+--	Position functions
+----------------------------------------------------------------------------------------
+local function SetOutside(obj, anchor, xOffset, yOffset)
+	xOffset = xOffset or 2
+	yOffset = yOffset or 2
+	anchor = anchor or obj:GetParent()
+
+	if obj:GetPoint() then
+		obj:ClearAllPoints()
+	end
+
+	obj:SetPoint("TOPLEFT", anchor, "TOPLEFT", -xOffset, yOffset)
+	obj:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", xOffset, -yOffset)
+end
+
+local function SetInside(obj, anchor, xOffset, yOffset)
+	xOffset = xOffset or 2
+	yOffset = yOffset or 2
+	anchor = anchor or obj:GetParent()
+
+	if obj:GetPoint() then
+		obj:ClearAllPoints()
+	end
+
+	obj:SetPoint("TOPLEFT", anchor, "TOPLEFT", xOffset, -yOffset)
+	obj:SetPoint("BOTTOMRIGHT", anchor, "BOTTOMRIGHT", -xOffset, yOffset)
+end
+
+----------------------------------------------------------------------------------------
 --	Template functions
 ----------------------------------------------------------------------------------------
 local function CreateOverlay(f)
@@ -126,14 +155,39 @@ local function CreateBackdrop(f, t)
 	f.backdrop = b
 end
 
+local StripTexturesBlizzFrames = {
+	"Inset",
+	"inset",
+	"InsetFrame",
+	"LeftInset",
+	"RightInset",
+	"NineSlice",
+	"BorderFrame",
+	"bottomInset",
+	"BottomInset",
+	"bgLeft",
+	"bgRight",
+	"FilligreeOverlay"
+}
+
 local function StripTextures(object, kill)
 	for i = 1, object:GetNumRegions() do
 		local region = select(i, object:GetRegions())
-		if region:GetObjectType() == "Texture" then
+		if region and region:GetObjectType() == "Texture" then
 			if kill then
 				region:Kill()
 			else
 				region:SetTexture(nil)
+			end
+		end
+	end
+
+	if not object:IsObjectType('Texture') then
+		local frameName = object.GetName and object:GetName()
+		for _, blizzard in pairs(StripTexturesBlizzFrames) do
+			local blizzFrame = object[blizzard] or frameName and _G[frameName..blizzard]
+			if blizzFrame then
+				blizzFrame:StripTextures(kill)
 			end
 		end
 	end
@@ -271,12 +325,14 @@ local function FadeOut(f)
 	UIFrameFadeOut(f, 0.8, f:GetAlpha(), 0)
 end
 
-local function addapi(object)
+local function addAPI(object)
 	local mt = getmetatable(object).__index
 	if not object.Size then mt.Size = Size end
 	if not object.Width then mt.Width = Width end
 	if not object.Height then mt.Height = Height end
 	if not object.Point then mt.Point = Point end
+	if not object.SetOutside then mt.SetOutside = SetOutside end
+	if not object.SetInside then mt.SetInside = SetInside end
 	if not object.CreateOverlay then mt.CreateOverlay = CreateOverlay end
 	if not object.CreateBorder then mt.CreateBorder = CreateBorder end
 	if not object.SetTemplate then mt.SetTemplate = SetTemplate end
@@ -293,16 +349,20 @@ end
 
 local handled = {["Frame"] = true}
 local object = CreateFrame("Frame")
-addapi(object)
-addapi(object:CreateTexture())
-addapi(object:CreateFontString())
+addAPI(object)
+addAPI(object:CreateTexture())
+addAPI(object:CreateFontString())
 
 object = EnumerateFrames()
 while object do
-	if not handled[object:GetObjectType()] then
-		addapi(object)
+	if not object:IsForbidden() and not handled[object:GetObjectType()] then
+		addAPI(object)
 		handled[object:GetObjectType()] = true
 	end
 
 	object = EnumerateFrames(object)
 end
+
+-- Hacky fix for issue on 7.1 PTR where scroll frames no longer seem to inherit the methods from the "Frame" widget
+local scrollFrame = CreateFrame("ScrollFrame")
+addAPI(scrollFrame)

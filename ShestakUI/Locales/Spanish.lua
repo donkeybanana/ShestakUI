@@ -5,13 +5,6 @@ if T.client ~= "esES" and T.client ~= "esMX" then return end
 --	Localization for esES and esMX client
 --	Translation: eXecrate, Seal
 ----------------------------------------------------------------------------------------
--- Announce your Lightwell
-L_ANNOUNCE_LA_USE = " usó mi Pozo de Luz. "
-L_ANNOUNCE_LA_CHARGE = " carga(s))"
-L_ANNOUNCE_LA_USELESS = " usó mi Pozo de Luz inútilmente. "
-L_ANNOUNCE_LA_PLACED = "Pozo de Luz colocado. "
-L_ANNOUNCE_LA_CHARGES = " cargas."
-
 -- Announce flasks and food
 L_ANNOUNCE_FF_NOFOOD = "No Food: " -- Needs review
 L_ANNOUNCE_FF_NOFLASK = "No Flask: " -- Needs review
@@ -63,6 +56,7 @@ L_MISC_BINDER_OPEN = "Mouse Bindings" -- Needs review
 L_MISC_GROCERY_BUY = "Buy" -- Needs review
 L_MISC_GROCERY_DESC = "Automatically buy grocery bags" -- Needs review
 L_MISC_SCROLL = "Pergamino"
+L_MISC_COLLAPSE = "The Collapse" -- Need review
 
 -- Raid Utility
 L_RAID_UTIL_DISBAND = "Disolver grupo"
@@ -103,6 +97,7 @@ L_MINIMAP_CALENDAR = "Calendario"
 L_MINIMAP_HEAL_LAYOUT = "Left-Click - Heal Layout" -- Needs review
 L_MINIMAP_DPS_LAYOUT = "Right-Click - DPS Layout" -- Needs review
 L_MINIMAP_BLIZZ_LAYOUT = "Middle-Click - Blizzard Layout" -- Needs review
+L_MINIMAP_ARTIFACT = "Right click to use" -- Needs review
 
 -- Chat
 L_CHAT_WHISPER = "De"
@@ -173,27 +168,6 @@ L_BIND_BINDING = "Asignación"
 L_BIND_KEY = "Tecla"
 L_BIND_NO_SET = "No tiene asignación"
 
--- Talent spec
-L_PLANNER_DRUID_4 = "Restauración"
-L_PLANNER_MONK_2 = "Tejedor de niebla"
-L_PLANNER_PALADIN_1 = "Sagrado"
-L_PLANNER_PRIEST_1 = "Disciplina"
-
--- BG stats
-L_DATATEXT_BASESASSAULTED = "Bases Asaltadas:"
-L_DATATEXT_BASESDEFENDED = "Bases Defendidas:"
-L_DATATEXT_TOWERSASSAULTED = "Torres Asaltadas:"
-L_DATATEXT_TOWERSDEFENDED = "Torres Defendidas:"
-L_DATATEXT_FLAGSCAPTURED = "Banderas Capturadas:"
-L_DATATEXT_FLAGSRETURNED = "Banderas Devueltas:"
-L_DATATEXT_GRAVEYARDSASSAULTED = "Cementerios Asaltados:"
-L_DATATEXT_GRAVEYARDSDEFENDED = "Cementerios Defendidos:"
-L_DATATEXT_DEMOLISHERSDESTROYED = "Catapultas Destruidas:"
-L_DATATEXT_GATESDESTROYED = "Puertas Destruidas:"
-L_DATATEXT_ORB_POSSESSIONS = "Orbes en Posesión:"
-L_DATATEXT_VICTORY_POINTS = "Puntos de Victoria:"
-L_DATATEXT_CARTS_CONTROLLED = "Vagonetas Controladas:"
-
 -- Info text
 L_INFO_ERRORS = "Ningún error aun."
 L_INFO_INVITE = "Invitación aceptada de "
@@ -237,6 +211,7 @@ L_COMBATTEXT_TEST_ENABLED = "Modo Texto de combate habilitado."
 L_COMBATTEXT_TEST_USE_UNLOCK = "Escribe /xct unlock para mover y cambiar el tamaño del marco de texto de combate."
 L_COMBATTEXT_TEST_USE_LOCK = "Escribe /xct lock para bloquear el marco de texto de combate."
 L_COMBATTEXT_TEST_USE_TEST = "Escribe /xct test para probar el modo Texto de combate."
+L_COMBATTEXT_TEST_USE_RESET = "Type /xct reset to restore default positions." -- Need review
 L_COMBATTEXT_POPUP = "Para guardar la posición de la ventana de texto de combate necesitas recargar tu UI."
 L_COMBATTEXT_UNSAVED = "La posición de la ventana de texto de combate no está guardada, no olvides recargar la UI."
 L_COMBATTEXT_UNLOCKED = "Texto de combate desbloqueado."

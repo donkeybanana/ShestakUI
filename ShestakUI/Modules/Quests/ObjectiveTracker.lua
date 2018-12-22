@@ -23,14 +23,47 @@ for _, headerName in pairs({"QuestHeader", "AchievementHeader", "ScenarioHeader"
 	ObjectiveTrackerFrame.BlocksFrame[headerName].Background:Hide()
 end
 BONUS_OBJECTIVE_TRACKER_MODULE.Header.Background:Hide()
+WORLD_QUEST_TRACKER_MODULE.Header.Background:Hide()
 
 ObjectiveTrackerFrame.HeaderMenu.Title:SetAlpha(0)
-OBJECTIVE_TRACKER_DOUBLE_LINE_HEIGHT = 30
+
+hooksecurefunc(DEFAULT_OBJECTIVE_TRACKER_MODULE, "SetStringText", function(_, fontString, _, useFullHeight)
+	local _, fontHeight = SystemFont_Shadow_Med1:GetFont()
+	local stringHeight = fontString:GetHeight()
+	if stringHeight > OBJECTIVE_TRACKER_DOUBLE_LINE_HEIGHT * 2 - (fontHeight * 2) and not useFullHeight then
+		fontString:SetHeight(fontHeight * 2)
+	end
+end)
 
 ----------------------------------------------------------------------------------------
 --	Skin ObjectiveTrackerFrame item buttons
 ----------------------------------------------------------------------------------------
 hooksecurefunc(QUEST_TRACKER_MODULE, "SetBlockHeader", function(_, block)
+	local item = block.itemButton
+
+	if item and not item.skinned then
+		item:SetSize(C.actionbar.button_size, C.actionbar.button_size)
+		item:SetTemplate("Default")
+		item:StyleButton()
+
+		item:SetNormalTexture(nil)
+
+		item.icon:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+		item.icon:SetPoint("TOPLEFT", item, 2, -2)
+		item.icon:SetPoint("BOTTOMRIGHT", item, -2, 2)
+
+		item.Cooldown:SetAllPoints(item.icon)
+
+		item.Count:ClearAllPoints()
+		item.Count:SetPoint("TOPLEFT", 1, -1)
+		item.Count:SetFont(C.font.action_bars_font, C.font.action_bars_font_size, C.font.action_bars_font_style)
+		item.Count:SetShadowOffset(C.font.action_bars_font_shadow and 1 or 0, C.font.action_bars_font_shadow and -1 or 0)
+
+		item.skinned = true
+	end
+end)
+
+hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddObjective", function(_, block)
 	local item = block.itemButton
 
 	if item and not item.skinned then
@@ -113,47 +146,55 @@ if C.skins.blizzard_frames == true then
 	button.plus:Hide()
 	hooksecurefunc("ObjectiveTracker_Collapse", function()
 		button.plus:Show()
+		if C.misc.minimize_mouseover then
+			button:SetAlpha(0)
+			button:HookScript("OnEnter", function() button:SetAlpha(1) end)
+			button:HookScript("OnLeave", function() button:SetAlpha(0) end)
+		end
 	end)
 
 	hooksecurefunc("ObjectiveTracker_Expand", function()
 		button.plus:Hide()
+		if C.misc.minimize_mouseover then
+			button:SetAlpha(1)
+			button:HookScript("OnEnter", function() button:SetAlpha(1) end)
+			button:HookScript("OnLeave", function() button:SetAlpha(1) end)
+		end
 	end)
 end
 
 ----------------------------------------------------------------------------------------
 --	Auto collapse ObjectiveTrackerFrame
 ----------------------------------------------------------------------------------------
-if C.automation.auto_collapse_reload then
+if C.automation.auto_collapse or C.automation.auto_collapse_reload then
 	local collapse = CreateFrame("Frame")
 	collapse:RegisterEvent("PLAYER_ENTERING_WORLD")
-	collapse:SetScript("OnEvent", function(self, event)
-		ObjectiveTracker_Collapse()
+	collapse:SetScript("OnEvent", function()
+		if C.automation.auto_collapse and not C.automation.auto_collapse_reload then
+			if IsInInstance() then
+				ObjectiveTracker_Collapse()
+			elseif ObjectiveTrackerFrame.collapsed and not InCombatLockdown() then
+				ObjectiveTracker_Expand()
+			end
+		elseif C.automation.auto_collapse_reload then
+			ObjectiveTracker_Collapse()
+		end
 	end)
 end
 
 ----------------------------------------------------------------------------------------
---	Mouseover for ObjectiveTrackerFrame.HeaderMenu.MinimizeButton
+--	Skin bonus/world quest objective progress bar
 ----------------------------------------------------------------------------------------
-if C.misc.minimize_mouseover then
-	local MinimizeButton = ObjectiveTrackerFrame.HeaderMenu.MinimizeButton
-	MinimizeButton:SetAlpha(0)
-	MinimizeButton:HookScript("OnEnter", function() MinimizeButton:SetAlpha(1) end)
-	MinimizeButton:HookScript("OnLeave", function() MinimizeButton:SetAlpha(0) end)
-end
-
-----------------------------------------------------------------------------------------
---	Skin bonus objective progress bar
-----------------------------------------------------------------------------------------
-hooksecurefunc(BONUS_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", function(self, block, line)
+local function SkinBar(line)
 	local progressBar = line.ProgressBar
 	local bar = progressBar.Bar
 	local icon = bar.Icon
+	local label = bar.Label
 
 	if not progressBar.styled then
-		local label = bar.Label
-
 		bar.BarFrame:Hide()
 		bar.BarGlow:Kill()
+		bar.Sheen:Hide()
 		bar.IconBG:Kill()
 		bar:SetSize(200, 20)
 		bar:SetStatusBarTexture(C.media.texture)
@@ -179,6 +220,38 @@ hooksecurefunc(BONUS_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", function(self, 
 	end
 
 	bar.newIconBg:SetShown(icon:IsShown())
+end
+
+hooksecurefunc(BONUS_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", function(_, _, line)
+	SkinBar(line)
+end)
+
+hooksecurefunc(WORLD_QUEST_TRACKER_MODULE, "AddProgressBar", function(_, _, line)
+	SkinBar(line)
+end)
+
+----------------------------------------------------------------------------------------
+--	Skin default quest objective progress bar
+----------------------------------------------------------------------------------------
+hooksecurefunc(DEFAULT_OBJECTIVE_TRACKER_MODULE, "AddProgressBar", function(self, block, line)
+	local progressBar = self.usedProgressBars[block] and self.usedProgressBars[block][line]
+	local bar = progressBar.Bar
+	local label = bar.Label
+
+	if not progressBar.styled then
+		bar:SetSize(200, 20)
+		bar:SetStatusBarTexture(C.media.texture)
+		bar:SetTemplate("Transparent")
+		bar:SetBackdropColor(0, 0, 0, 0)
+		bar:DisableDrawLayer("ARTWORK")
+
+		label:ClearAllPoints()
+		label:SetPoint("CENTER", 0, -1)
+		label:SetFont(C.media.pixel_font, C.media.pixel_font_size, C.media.pixel_font_style)
+		label:SetDrawLayer("OVERLAY")
+
+		progressBar.styled = true
+	end
 end)
 
 ----------------------------------------------------------------------------------------
@@ -187,7 +260,6 @@ end)
 local function IsFramePositionedLeft(frame)
 	local x = frame:GetCenter()
 	local screenWidth = GetScreenWidth()
-	local screenHeight = GetScreenHeight()
 	local positionedLeft = false
 
 	if x and x < (screenWidth / 2) then
@@ -209,7 +281,7 @@ end)
 ----------------------------------------------------------------------------------------
 ObjectiveTrackerScenarioRewardsFrame.Show = T.dummy
 
-hooksecurefunc("BonusObjectiveTracker_AnimateReward", function(block)
+hooksecurefunc("BonusObjectiveTracker_AnimateReward", function()
 	ObjectiveTrackerBonusRewardsFrame:ClearAllPoints()
 	ObjectiveTrackerBonusRewardsFrame:SetPoint("BOTTOM", UIParent, "TOP", 0, 90)
 end)

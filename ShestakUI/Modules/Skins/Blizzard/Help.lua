@@ -9,13 +9,12 @@ local function LoadSkin()
 		"HelpFrameLeftInset",
 		"HelpFrameMainInset",
 		"HelpFrameKnowledgebase",
-		"HelpFrameKnowledgebaseErrorFrame",
-		"ReportPlayerNameDialogCommentFrame",
-		"ReportCheatingDialogCommentFrame"
+		"HelpFrameKnowledgebaseErrorFrame"
 	}
 
 	local buttons = {
 		"HelpFrameAccountSecurityOpenTicket",
+		"HelpFrameOpenTicketHelpOpenTicket",
 		"HelpFrameKnowledgebaseSearchButton",
 		"HelpFrameKnowledgebaseNavBarHomeButton",
 		"HelpFrameCharacterStuckStuck",
@@ -24,10 +23,7 @@ local function LoadSkin()
 		"HelpFrameSubmitSuggestionSubmit",
 		"HelpFrameReportBugSubmit",
 		"HelpFrameButton16",
-		"ReportCheatingDialogCancelButton",
-		"ReportCheatingDialogReportButton",
-		"ReportPlayerNameDialogReportButton",
-		"ReportPlayerNameDialogCancelButton"
+		"GMChatOpenLog"
 	}
 
 	HelpFrameKnowledgebaseNavBarHomeButton:StripTextures(false)
@@ -139,7 +135,6 @@ local function LoadSkin()
 	HelpFrameKnowledgebaseSearchBox:SetPoint("TOPLEFT", HelpFrameMainInset, "TOPLEFT", 13, -10)
 	HelpFrameKnowledgebaseNavBarHomeButton:ClearAllPoints()
 	HelpFrameKnowledgebaseNavBarHomeButton:SetPoint("TOPLEFT", HelpFrameKnowledgebaseSearchBox, "BOTTOMLEFT", -2, -10)
-	HelpFrameKnowledgebaseNavBarOverlay:Kill()
 	HelpFrameKnowledgebaseNavBar:StripTextures()
 	HelpFrame:StripTextures(true)
 	HelpFrame:CreateBackdrop("Transparent")
@@ -156,12 +151,6 @@ local function LoadSkin()
 	HelpFrameCharacterStuckHearthstone.IconTexture:SetPoint("BOTTOMRIGHT", -2, 2)
 	HelpFrameCharacterStuckHearthstone.IconTexture:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 	HelpFrameCharacterStuckHearthstone.SetHighlightTexture = T.dummy
-
-	-- Report frames
-	ReportPlayerNameDialog:StripTextures()
-	ReportPlayerNameDialog:CreateBackdrop("Transparent")
-	ReportCheatingDialog:StripTextures()
-	ReportCheatingDialog:CreateBackdrop("Transparent")
 
 	for i = 1, HelpFrameGM_Response:GetNumChildren() do
 		local child = select(i, HelpFrameGM_Response:GetChildren())

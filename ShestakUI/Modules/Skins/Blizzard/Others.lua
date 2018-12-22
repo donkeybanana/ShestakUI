@@ -31,8 +31,6 @@ SkinBlizzUI:SetScript("OnEvent", function(self, event, addon)
 			"ColorPickerFrame",
 			"LFDRoleCheckPopup",
 			"LFDReadyCheckPopup",
-			"ChannelPulloutBackground",
-			"ChannelPulloutTab",
 			"GuildInviteFrame",
 			"RolePollPopup",
 			"BaudErrorFrame",
@@ -66,7 +64,7 @@ SkinBlizzUI:SetScript("OnEvent", function(self, event, addon)
 
 		-- Reskin popups
 		for i = 1, 4 do
-			for j = 1, 3 do
+			for j = 1, 4 do
 				_G["StaticPopup"..i.."Button"..j]:SkinButton()
 			end
 			_G["StaticPopup"..i]:StripTextures()
@@ -86,6 +84,7 @@ SkinBlizzUI:SetScript("OnEvent", function(self, event, addon)
 			_G["StaticPopup"..i.."ItemFrame"]:GetNormalTexture():Kill()
 			_G["StaticPopup"..i.."ItemFrame"]:SetTemplate("Default")
 			_G["StaticPopup"..i.."ItemFrame"]:StyleButton()
+			_G["StaticPopup"..i.."ItemFrame"].IconBorder:SetAlpha(0)
 			_G["StaticPopup"..i.."ItemFrameIconTexture"]:SetTexCoord(0.1, 0.9, 0.1, 0.9)
 			_G["StaticPopup"..i.."ItemFrameIconTexture"]:ClearAllPoints()
 			_G["StaticPopup"..i.."ItemFrameIconTexture"]:SetPoint("TOPLEFT", 2, -2)
@@ -252,11 +251,6 @@ SkinBlizzUI:SetScript("OnEvent", function(self, event, addon)
 		_G["ReadyCheckFrameText"]:SetParent(_G["ReadyCheckFrame"])
 		_G["ReadyCheckFrameText"]:ClearAllPoints()
 		_G["ReadyCheckFrameText"]:SetPoint("TOP", 0, -12)
-		_G["ChannelPulloutTabText"]:ClearAllPoints()
-		_G["ChannelPulloutTabText"]:SetPoint("TOP", _G["ChannelPulloutTab"], "TOP", 0, -6)
-		_G["ChannelPulloutTab"]:SetHeight(20)
-		_G["ChannelPullout"]:ClearAllPoints()
-		_G["ChannelPullout"]:SetPoint("TOP", _G["ChannelPulloutTab"], "BOTTOM", 0, -3)
 
 		-- Others
 		for i = 1, 10 do
@@ -267,17 +261,12 @@ SkinBlizzUI:SetScript("OnEvent", function(self, event, addon)
 		_G["ReadyCheckFrame"]:HookScript("OnShow", function(self) if UnitIsUnit("player", self.initiator) then self:Hide() end end)
 		_G["StackSplitFrame"]:GetRegions():Hide()
 		_G["StackSplitFrame"]:SetFrameStrata("TOOLTIP")
-		_G["ChannelPulloutTabLeft"]:SetTexture(nil)
-		_G["ChannelPulloutTabMiddle"]:SetTexture(nil)
-		_G["ChannelPulloutTabRight"]:SetTexture(nil)
 		_G["StaticPopup1CloseButton"]:HookScript("OnShow", function(self)
 			self:StripTextures(true)
 			T.SkinCloseButton(self, nil, "-")
 		end)
-		T.SkinCloseButton(_G["ChannelPulloutCloseButton"])
 		T.SkinCloseButton(_G["RolePollPopupCloseButton"])
 		T.SkinCloseButton(_G["ItemRefCloseButton"])
-		T.SkinCloseButton(_G["BNToastFrameCloseButton"])
 		if C.skins.blizzard_frames == true then
 			-- Social Browser frame
 			SocialBrowserFrame:StripTextures()
@@ -290,8 +279,9 @@ SkinBlizzUI:SetScript("OnEvent", function(self, event, addon)
 			SplashFrame.BottomCloseButton:SkinButton()
 			T.SkinCloseButton(SplashFrame.TopCloseButton)
 
-			-- NavBar Buttons (Used in WorldMapFrame, EncounterJournal and HelpFrame)
+			-- NavBar Buttons (Used in EncounterJournal and HelpFrame)
 			local function SkinNavBarButtons(self)
+				if self:GetParent():GetName() == "WorldMapFrame" then return end
 				local navButton = self.navList[#self.navList]
 				if navButton and not navButton.isSkinned then
 					navButton:SkinButton(true)
@@ -307,6 +297,7 @@ SkinBlizzUI:SetScript("OnEvent", function(self, event, addon)
 			hooksecurefunc("NavBar_AddButton", SkinNavBarButtons)
 
 			local function SetHomeButtonOffsetX(self)
+				if self:GetParent():GetName() == "WorldMapFrame" then return end
 				if self.homeButton then
 					self.homeButton.xoffset = 1
 				end
@@ -335,6 +326,27 @@ SkinBlizzUI:SetScript("OnEvent", function(self, event, addon)
 				CliqueSpellTab.backdrop:SetAllPoints()
 				CliqueSpellTab:StyleButton()
 			end
+
+			local function SkinIconArray(baseName, rowSize, numRows)
+				for i = 1, rowSize * numRows do
+					local button = _G[baseName..i]
+					local texture = _G[baseName..i.."Icon"]
+
+					button:StripTextures()
+					button:StyleButton(true)
+					button:SetTemplate("Default")
+
+					texture:ClearAllPoints()
+					texture:SetPoint("TOPLEFT", 2, -2)
+					texture:SetPoint("BOTTOMRIGHT", -2, 2)
+					texture:SetTexCoord(0.1, 0.9, 0.1, 0.9)
+				end
+			end
+
+			-- This is used to create icons for the GuildBankPopupFrame, MacroPopupFrame, and GearManagerDialogPopup
+			hooksecurefunc("BuildIconArray", function(parent, baseName, template, rowSize, numRows, onButtonCreated)
+				SkinIconArray(baseName, rowSize, numRows)
+			end)
 		end
 	end
 

@@ -40,6 +40,9 @@ do
 			["Curse"] = true,
 			["Poison"] = true,
 		},
+		["MAGE"] = {
+			["Curse"] = true,
+		},
 		["MONK"] = {
 			["Magic"] = false,
 			["Poison"] = true,
@@ -52,7 +55,7 @@ do
 		},
 		["PRIEST"] = {
 			["Magic"] = false,
-			["Disease"] = false,
+			["Disease"] = true,
 		},
 		["SHAMAN"] = {
 			["Magic"] = false,
@@ -87,10 +90,8 @@ local function CheckSpec()
 	elseif T.class == "PRIEST" then
 		if spec == 3 then
 			DispellFilter.Magic = false
-			DispellFilter.Disease = false
 		else
 			DispellFilter.Magic = true
-			DispellFilter.Disease = true
 		end
 	elseif T.class == "SHAMAN" then
 		if spec == 3 then
@@ -128,7 +129,7 @@ end
 
 local UpdateDebuffFrame = function(rd)
 	if rd.index and rd.type and rd.filter then
-		local name, rank, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff = UnitAura(rd.__owner.unit, rd.index, rd.filter)
+		local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff = UnitAura(rd.__owner.unit, rd.index, rd.filter)
 
 		if rd.icon then
 			rd.icon:SetTexture(icon)
@@ -196,7 +197,7 @@ local Update = function(self, event, unit)
 		local i = 0
 		while(true) do
 			i = i + 1
-			local name, rank, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff = UnitAura(unit, i, filter)
+			local name, icon, count, debuffType, duration, expirationTime, _, _, _, spellId, _, isBossDebuff = UnitAura(unit, i, filter)
 			if not name then break end
 
 			if rd.ShowBossDebuff and isBossDebuff then

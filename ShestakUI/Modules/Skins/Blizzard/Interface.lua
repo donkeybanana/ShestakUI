@@ -77,6 +77,7 @@ local function LoadSkin()
 		"SocialPanelOnlineFriends",
 		"SocialPanelOfflineFriends",
 		"SocialPanelBroadcasts",
+		"SocialPanelAutoAcceptQuickJoinRequests",
 		"SocialPanelFriendRequests",
 		"SocialPanelShowToastWindow",
 		"SocialPanelEnableTwitter",
@@ -86,15 +87,18 @@ local function LoadSkin()
 		"ActionBarsPanelRight",
 		"ActionBarsPanelRightTwo",
 		"ActionBarsPanelAlwaysShowActionBars",
+		"ActionBarsPanelStackRightBars",
 		"ActionBarsPanelLockActionBars",
 		"ActionBarsPanelCountdownCooldowns",
 		-- Names
 		"NamesPanelMyName",
 		"NamesPanelFriendlyPlayerNames",
 		"NamesPanelNonCombatCreature",
-		"NamesPanelFriendlyMinions",
 		"NamesPanelEnemyPlayerNames",
+		"NamesPanelUnitNameplatesEnemies",
 		"NamesPanelEnemyMinions",
+		"NamesPanelUnitNameplatesFriends",
+		"NamesPanelFriendlyMinions",
 		"NamesPanelUnitNameplatesPersonalResource",
 		"NamesPanelUnitNameplatesPersonalResourceOnEnemy",
 		"NamesPanelUnitNameplatesFriendlyMinions",
@@ -109,6 +113,7 @@ local function LoadSkin()
 		"MousePanelInvertMouse",
 		"MousePanelClickToMove",
 		"MousePanelEnableMouseSpeed",
+		"MousePanelLockCursorToScreen",
 		-- Assessability
 		"AccessibilityPanelMovePad",
 		"AccessibilityPanelCinematicSubtitles",
@@ -201,10 +206,8 @@ local function LoadSkin()
 
 	local sliders = {
 		"InterfaceOptionsCombatPanelSpellAlertOpacitySlider",
-		"InterfaceOptionsCombatPanelMaxSpellStartRecoveryOffset",
 		"CompactUnitFrameProfilesGeneralOptionsFrameHeightSlider",
 		"CompactUnitFrameProfilesGeneralOptionsFrameWidthSlider",
-		"InterfaceOptionsBattlenetPanelToastDurationSlider",
 		"InterfaceOptionsCameraPanelMaxDistanceSlider",
 		"InterfaceOptionsCameraPanelFollowSpeedSlider",
 		"InterfaceOptionsMousePanelMouseSensitivitySlider",
@@ -213,7 +216,7 @@ local function LoadSkin()
 		"OpacityFrameSlider"
 	}
 
-	for i = 1, getn(sliders) do
+	for i = 1, #sliders do
 		local slider = _G[sliders[i]]
 		if slider then
 			T.SkinSlider(slider)
@@ -236,9 +239,6 @@ local function LoadSkin()
 	_G["InterfaceOptionsFrameTab2"]:SetPoint("TOPLEFT", _G["InterfaceOptionsFrameTab1"], "TOPRIGHT", 3, 0)
 	_G["InterfaceOptionsFrameTab2"]:SetWidth(112)
 	_G["InterfaceOptionsFrameTab2"].SetWidth = T.dummy
-	_G["InterfaceOptionsFrameTab1TabSpacer"]:Kill()
-	_G["InterfaceOptionsFrameTab2TabSpacer1"]:Kill()
-	_G["InterfaceOptionsFrameTab2TabSpacer2"]:Kill()
 end
 
 tinsert(T.SkinFuncs["ShestakUI"], LoadSkin)

@@ -10,6 +10,8 @@ local function LoadSkin()
 	TradeSkillFrame.DetailsInset:StripTextures()
 	TradeSkillFrame.DetailsFrame.Background:Hide()
 
+	TradeSkillFramePortrait:SetAlpha(0)
+
 	TradeSkillFrame.RecipeList.LearnedTab:StripTextures()
 	TradeSkillFrame.RecipeList.UnlearnedTab:StripTextures()
 
@@ -17,16 +19,6 @@ local function LoadSkin()
 	TradeSkillFrame.RankFrame:StripTextures()
 	TradeSkillFrame.RankFrame:CreateBackdrop("Overlay")
 	TradeSkillFrame.RankFrame:SetStatusBarTexture(C.media.texture)
-
-	--BETA for i = 1, TRADE_SKILLS_DISPLAYED do
-		-- local bar = _G["TradeSkillSkill"..i.."SubSkillRankBar"]
-		-- if bar then
-			-- bar:StripTextures()
-			-- bar:CreateBackdrop("Overlay")
-			-- bar:SetStatusBarTexture(C.media.texture)
-			-- bar:SetHeight(9)
-		-- end
-	-- end
 
 	TradeSkillFrame.FilterButton:StripTextures(true)
 	TradeSkillFrame.FilterButton:SkinButton(true)
@@ -50,18 +42,19 @@ local function LoadSkin()
 
 	T.SkinNextPrevButton(TradeSkillFrame.DetailsFrame.CreateMultipleInputBox.DecrementButton, true)
 	T.SkinNextPrevButton(TradeSkillFrame.DetailsFrame.CreateMultipleInputBox.IncrementButton)
-	TradeSkillFrame.DetailsFrame.CreateMultipleInputBox.IncrementButton:SetPoint("LEFT", TradeSkillFrame.DetailsFrame.CreateMultipleInputBox, "RIGHT", 4, 0)
+	TradeSkillFrame.DetailsFrame.CreateMultipleInputBox.IncrementButton:SetPoint("LEFT", TradeSkillFrame.DetailsFrame.CreateMultipleInputBox, "RIGHT", 5, 0)
 	TradeSkillFrame.DetailsFrame.CreateMultipleInputBox.IncrementButton:SetSize(22, 22)
 	TradeSkillFrame.DetailsFrame.CreateMultipleInputBox.DecrementButton:SetSize(22, 22)
 
+	TradeSkillFrame.DetailsFrame.ExitButton:SetPoint("TOPRIGHT", TradeSkillFrame.DetailsFrame, "BOTTOMRIGHT", 28, -3)
+
 	T.SkinCloseButton(TradeSkillFrameCloseButton)
 
-	T.SkinScrollBar(TradeSkillFrame.RecipeList.scrollBar, "TradeSkillFrame")
+	T.SkinScrollBar(TradeSkillFrame.RecipeList.scrollBar)
 	T.SkinScrollBar(TradeSkillFrame.DetailsFrame.ScrollBar)
 
 	hooksecurefunc(TradeSkillFrame.DetailsFrame, "RefreshDisplay", function()
 		local ResultIcon = TradeSkillFrame.DetailsFrame.Contents.ResultIcon
-		ResultIcon:StyleButton(true)
 		ResultIcon:SetTemplate("Default")
 		if ResultIcon:GetNormalTexture() then
 			ResultIcon:GetNormalTexture():SetTexCoord(0.1, 0.9, 0.1, 0.9)
@@ -69,7 +62,8 @@ local function LoadSkin()
 			ResultIcon:GetNormalTexture():SetPoint("TOPLEFT", 2, -2)
 			ResultIcon:GetNormalTexture():SetPoint("BOTTOMRIGHT", -2, 2)
 		end
-		ResultIcon.Background:SetTexture(nil)
+		ResultIcon.ResultBorder:SetTexture(nil)
+		ResultIcon.IconBorder:SetTexture(nil)
 
 		for i = 1, #TradeSkillFrame.DetailsFrame.Contents.Reagents do
 			local button = TradeSkillFrame.DetailsFrame.Contents.Reagents[i]
@@ -99,16 +93,35 @@ local function LoadSkin()
 		end
 	end)
 
+	local function SkinSkillRankBar(self, _, tradeSkillInfo)
+		if tradeSkillInfo.hasProgressBar then
+			local bar = self.SubSkillRankBar
+			if not bar.backdrop then
+				bar:StripTextures()
+				bar:CreateBackdrop("Overlay")
+				bar:SetStatusBarTexture(C.media.texture)
+				bar:SetHeight(9)
+			end
+		end
+	end
+
+	hooksecurefunc(TradeSkillFrame.RecipeList, "Refresh", function()
+		for _, button in ipairs(TradeSkillFrame.RecipeList.buttons) do
+			if not button.skin then
+				hooksecurefunc(button, "SetUpHeader", SkinSkillRankBar)
+				button.skin = true
+			end
+		end
+	end)
+
 	-- Guild Crafters
-	TradeSkillFrame.DetailsFrame.ViewGuildCraftersButton.LeftSeparator:SetTexture(nil)
-	TradeSkillFrame.DetailsFrame.ViewGuildCraftersButton.RightSeparator:SetTexture(nil)
 	TradeSkillFrame.DetailsFrame.GuildFrame:StripTextures()
 	TradeSkillFrame.DetailsFrame.GuildFrame:SetTemplate("Transparent")
 	TradeSkillFrame.DetailsFrame.GuildFrame.Container:StripTextures()
 	TradeSkillFrame.DetailsFrame.GuildFrame.Container:SetTemplate("Transparent")
 	TradeSkillFrame.DetailsFrame.ViewGuildCraftersButton:SkinButton(true)
 	T.SkinCloseButton(TradeSkillFrame.DetailsFrame.GuildFrame.CloseButton)
-	--BETA T.SkinScrollBar(TradeSkillFrame.DetailsFrame.GuildFrame.Container.ScrollFrame.scrollBar)
+	T.SkinScrollBar(TradeSkillFrameScrollFrame.scrollBar)
 
 	if Auctionator_Search then
 		Auctionator_Search:SkinButton(true)

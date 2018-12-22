@@ -54,6 +54,7 @@ frame:SetScript("OnEvent", function(self, event, addon)
 	SetFont(SystemFont_Shadow_Huge1, NORMAL, 20)
 	SetFont(SystemFont_Shadow_Huge3, NORMAL, 25)
 	SetFont(SystemFont_Shadow_Large, NORMAL, 17)
+	SetFont(SystemFont_Shadow_Large2, NORMAL, 17)
 	SetFont(SystemFont_Shadow_Med1, NORMAL, 13)
 	SetFont(SystemFont_Shadow_Med2, NORMAL, 13)
 	SetFont(SystemFont_Shadow_Med3, NORMAL, 15)
@@ -77,19 +78,18 @@ frame:SetScript("OnEvent", function(self, event, addon)
 	SetFont(CoreAbilityFont, NORMAL, 32, nil, 1, 0.82, 0, 0, 0, 0, 1, -1)
 	SetFont(ChatBubbleFont, NORMAL, 14)
 	SetFont(WhiteNormalNumberFont, NORMAL, 11)
+	SetFont(NumberFontNormalSmall, NORMAL, 11, "OUTLINE")
+	SetFont(Game13FontShadow, NORMAL, 14)
+	SetFont(Game15Font_o1, NORMAL, 15)
+	SetFont(Fancy14Font, NORMAL, 14)
 
 	-- Derived fonts
 	SetFont(BossEmoteNormalHuge, NORMAL, 27, "THICKOUTLINE")
 	SetFont(ErrorFont, NORMAL, 16)
 	SetFont(QuestFontNormalSmall, NORMAL, 13, nil, nil, nil, nil, 0.54, 0.4, 0.1)
-	SetFont(WorldMapTextFont, NORMAL, 31, "THICKOUTLINE", nil, nil, nil, 0, 0, 0, 1, -1)
+	SetFont(WorldMapTextFont, NORMAL, 32, "OUTLINE")
+	SetFont(SubZoneTextFont, NORMAL, 30, "OUTLINE")
 	SetFont(HelpFrameKnowledgebaseNavBarHomeButtonText, NORMAL, 13, nil, nil, nil, nil, 0, 0, 0, 1, -1)
-
-	-- Channel list
-	for i = 1, MAX_CHANNEL_BUTTONS do
-		local f = _G["ChannelButton"..i.."Text"]
-		f:SetFontObject(GameFontNormalSmallLeft)
-	end
 
 	-- Player title
 	for _, butt in pairs(PaperDollTitlesPane.buttons) do butt.text:SetFontObject(GameFontHighlightSmallLeft) end

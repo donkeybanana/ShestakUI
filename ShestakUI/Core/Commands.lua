@@ -6,6 +6,7 @@
 SlashCmdList.RELOADUI = function() ReloadUI() end
 SLASH_RELOADUI1 = "/rl"
 SLASH_RELOADUI2 = "/кд"
+SLASH_RELOADUI3 = "//"
 
 SlashCmdList.RCSLASH = function() DoReadyCheck() end
 SLASH_RCSLASH1 = "/rc"
@@ -23,16 +24,6 @@ SLASH_JOURNAL2 = "/уо"
 SlashCmdList.ROLECHECK = function() InitiateRolePoll() end
 SLASH_ROLECHECK1 = "/role"
 SLASH_ROLECHECK2 = "/кщду"
-
-SlashCmdList.SHOWCLOAK = function() if ShowingCloak() then ShowCloak(false) else ShowCloak() end end
-SLASH_SHOWCLOAK1 = "/showcloak"
-SLASH_SHOWCLOAK2 = "/sc"
-SLASH_SHOWCLOAK3 = "/ыс"
-
-SlashCmdList.SHOWHELM = function() if ShowingHelm() then ShowHelm(false) else ShowHelm() end end
-SLASH_SHOWHELM1 = "/showhelm"
-SLASH_SHOWHELM2 = "/sh"
-SLASH_SHOWHELM3 = "/ыр"
 
 SlashCmdList.CLEARCOMBAT = function() CombatLogClearEntries() end
 SLASH_CLEARCOMBAT1 = "/clc"
@@ -246,9 +237,9 @@ SlashCmdList["FRAMELIST"] = function(msg)
 	local isPreviouslyShown = FrameStackTooltip:IsShown()
 	if not isPreviouslyShown then
 		if msg == tostring(true) then
-			FrameStackTooltip_Toggle(true)
+			FrameStackTooltip_Toggle(true, true, true)
 		else
-			FrameStackTooltip_Toggle()
+			FrameStackTooltip_Toggle(false, true, true)
 		end
 	end
 
@@ -294,25 +285,27 @@ SLASH_CLEAR_CHAT2 = "/сдуфк"
 --	Test Blizzard Alerts
 ----------------------------------------------------------------------------------------
 SlashCmdList.TEST_ACHIEVEMENT = function()
-	PlaySound("LFG_Rewards")
+	PlaySound(SOUNDKIT.LFG_REWARDS)
 	if not AchievementFrame then
 		AchievementFrame_LoadUI()
 	end
 	AchievementAlertSystem:AddAlert(112)
 	CriteriaAlertSystem:AddAlert(9023, "Doing great!")
+	GuildChallengeAlertSystem:AddAlert(3, 2, 5)
+	InvasionAlertSystem:AddAlert(678, "Legion", true, 1, 1)
+	-- WorldQuestCompleteAlertSystem:AddAlert(42114)
+	local follower = _G.C_Garrison.GetFollowers(LE_FOLLOWER_TYPE_GARRISON_7_0)[1]
+	GarrisonFollowerAlertSystem:AddAlert(follower.followerID, follower.name, follower.level, follower.quality, isUpgraded, follower)
+	GarrisonShipFollowerAlertSystem:AddAlert(592, "Ship", "Transport", "GarrBuilding_Barracks_1_H", 3, 2, 1)
+	GarrisonBuildingAlertSystem:AddAlert("Barracks")
+	GarrisonTalentAlertSystem:AddAlert(3, _G.C_Garrison.GetTalent(370))
+	LegendaryItemAlertSystem:AddAlert("\124cffa335ee\124Hitem:18832:0:0:0:0:0:0:0:0:0:0\124h[Brutality Blade]\124h\124r")
 	LootAlertSystem:AddAlert("\124cffa335ee\124Hitem:18832::::::::::\124h[Brutality Blade]\124h\124r", 1, 1, 100, 2, false, false, 0, false, false)
 	LootUpgradeAlertSystem:AddAlert("\124cffa335ee\124Hitem:18832::::::::::\124h[Brutality Blade]\124h\124r", 1, 1, 1, nil, nil, false)
 	MoneyWonAlertSystem:AddAlert(815)
-	NewRecipeLearnedAlertSystem:AddAlert(204)
-	GuildChallengeAlertSystem:AddAlert(3, 2, 5)
-	InvasionAlertSystem:AddAlert(1)
-	WorldQuestCompleteAlertSystem:AddAlert(112)
-	LegendaryItemAlertSystem:AddAlert("\124cffa335ee\124Hitem:18832:0:0:0:0:0:0:0:0:0:0\124h[Brutality Blade]\124h\124r")
 	StorePurchaseAlertSystem:AddAlert("\124cffa335ee\124Hitem:180545::::::::::\124h[Mystic Runesaber]\124h\124r", "", "", 214)
 	DigsiteCompleteAlertSystem:AddAlert(1)
-	GarrisonShipFollowerAlertSystem:AddAlert(592, "Ship", "Transport", "GarrBuilding_Barracks_1_H", 3, 2, 1)
-	GarrisonBuildingAlertSystem:AddAlert("Barracks")
-	GarrisonFollowerAlertSystem:AddAlert(204, "Ben Stone", 90, 3, false)
+	NewRecipeLearnedAlertSystem:AddAlert(204)
 end
 SLASH_TEST_ACHIEVEMENT1 = "/tach"
 SLASH_TEST_ACHIEVEMENT2 = "/ефср"
